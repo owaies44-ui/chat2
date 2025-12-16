@@ -7,10 +7,7 @@
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="غرفة المشرفين">
-    <link rel="apple-touch-icon" href="https://cdn-icons-png.flaticon.com/512/993/993891.png">
     
-    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Cpath fill='%234a69bd' d='M32 2C16 2 4 14 4 14s2 30 28 48c26-18 28-48 28-48S48 2 32 2zm0 8c12 0 20 8 20 8s-2 22-20 36C14 40 12 18 12 18s8-8 20-8z'/%3E%3Cpath fill='%234a69bd' d='M32 18v24' stroke='%234a69bd' stroke-width='4' stroke-linecap='round'/%3E%3C/svg%3E">
-
     <title>غرفة عمليات المشرفين 🛡️</title>
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700&display=swap" rel="stylesheet">
     
@@ -22,7 +19,6 @@
             --urgent: #ff6b6b; --warning: #feca57;
             --border-radius: 15px;
         }
-
         :root[data-theme="dark"] {
             --primary: #6a89cc; 
             --bg-body: #1e272e; --bg-card: #2f3640;
@@ -32,79 +28,61 @@
         body {
             font-family: 'Cairo', sans-serif; background: var(--bg-body); color: var(--text-main);
             margin: 0; padding: 15px; display: flex; flex-direction: column; align-items: center;
-            min-height: 100vh; transition: background 0.3s; -webkit-tap-highlight-color: transparent;
+            min-height: 100vh; transition: background 0.3s;
         }
 
-        .container { width: 100%; max-width: 600px; display: flex; flex-direction: column; gap: 15px; }
+        .container { width: 100%; max-width: 600px; display: none; /* مخفي افتراضياً */ flex-direction: column; gap: 15px; }
 
-        /* الأزرار العلوية */
+        /* شاشة القفل (للضيوف) */
+        #lock-screen {
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            height: 80vh; text-align: center; gap: 20px;
+        }
+        .lock-icon { font-size: 80px; margin-bottom: 20px; animation: bounce 2s infinite; }
+        @keyframes bounce { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
+
+        /* الأزرار */
         .controls { display: flex; gap: 8px; flex-wrap: wrap; justify-content: center; margin-bottom: 5px; }
         button {
-            border: none; padding: 8px 16px; border-radius: 50px; cursor: pointer; font-family: inherit; font-weight: bold; font-size: 0.9rem;
+            border: none; padding: 10px 20px; border-radius: 50px; cursor: pointer; font-family: inherit; font-weight: bold;
             background: var(--primary); color: white; transition: transform 0.2s;
         }
         button:active { transform: scale(0.95); }
         button.outline { background: transparent; border: 1px solid var(--primary); color: var(--primary); }
         button.danger { background: var(--urgent); color: white; }
 
-        /* اللوحة الثابتة */
+        /* اللوحة والرسائل */
         .sticky-board {
             background: var(--bg-card); padding: 15px; border-radius: var(--border-radius);
             box-shadow: 0 4px 15px rgba(0,0,0,0.05); border-top: 5px solid var(--warning);
         }
-        .board-title { margin: 0 0 10px 0; color: var(--text-sub); font-size: 0.85rem; display: flex; justify-content: space-between; }
-        #sticky-content { font-size: 1rem; line-height: 1.6; min-height: 50px; outline: none; white-space: pre-wrap; }
-
-        /* منطقة الإدخال */
         .input-area {
             background: var(--bg-card); padding: 15px; border-radius: var(--border-radius);
-            box-shadow: 0 4px 15px rgba(0,0,0,0.05); display: none; gap: 10px; flex-direction: column;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05); display: flex; gap: 10px; flex-direction: column;
         }
         textarea {
             width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 10px;
             font-family: 'Cairo'; font-size: 1rem; resize: none; min-height: 60px;
             background: var(--bg-body); color: var(--text-main); box-sizing: border-box;
         }
+        .input-tools { display: flex; justify-content: space-between; align-items: center; }
         
-        .input-tools { display: flex; justify-content: space-between; align-items: center; gap: 10px; }
-        .tool-group { display: flex; gap: 5px; align-items: center; }
-        select { padding: 8px; border-radius: 20px; border: 1px solid #ccc; font-family: 'Cairo'; background: var(--bg-body); color: var(--text-main); }
-        
-        /* معاينة الصورة */
-        #preview-container {
-            display: none; position: relative; width: fit-content; margin-bottom: 10px;
-        }
-        #img-preview { max-width: 100px; max-height: 100px; border-radius: 10px; border: 2px solid var(--primary); }
-        #remove-img {
-            position: absolute; top: -8px; left: -8px; background: var(--urgent); color: white;
-            border-radius: 50%; width: 20px; height: 20px; text-align: center; line-height: 20px;
-            cursor: pointer; font-size: 12px; font-weight: bold;
-        }
-
-        /* البطاقات والرسائل */
         .log-feed { display: flex; flex-direction: column; gap: 12px; padding-bottom: 40px; }
         .message-card {
             background: var(--bg-card); padding: 15px; border-radius: var(--border-radius);
             position: relative; border-right: 4px solid transparent;
             box-shadow: 0 2px 5px rgba(0,0,0,0.03); animation: fadeIn 0.3s ease;
         }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-
         .msg-normal { border-right-color: var(--secondary); }
         .msg-important { border-right-color: var(--warning); background: rgba(254, 202, 87, 0.1); }
         .msg-urgent { border-right-color: var(--urgent); background: rgba(255, 107, 107, 0.1); border: 1px solid var(--urgent); }
-
         .msg-header { display: flex; justify-content: space-between; font-size: 0.75rem; color: var(--text-sub); margin-bottom: 8px; }
         .sender-name { font-weight: bold; color: var(--primary); }
-        .msg-content { font-size: 1rem; line-height: 1.5; white-space: pre-wrap; word-break: break-word; }
-        
-        /* تنسيق الصورة داخل الرسالة */
-        .msg-image {
-            margin-top: 10px; max-width: 100%; border-radius: 8px; cursor: pointer;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.1); display: block;
-        }
+        .msg-image { margin-top: 10px; max-width: 100%; border-radius: 8px; cursor: pointer; }
 
-        /* النوافذ المنبثقة */
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+        /* النوافذ */
         .modal {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6);
             display: none; justify-content: center; align-items: center; z-index: 1000; backdrop-filter: blur(3px);
@@ -113,56 +91,49 @@
             background: var(--bg-card); padding: 25px; border-radius: 20px; width: 85%; max-width: 320px;
             text-align: center; box-shadow: 0 10px 30px rgba(0,0,0,0.2);
         }
-        .modal input { width: 100%; padding: 12px; margin: 8px 0; border-radius: 8px; border: 1px solid #ccc; box-sizing: border-box; text-align: center; font-size: 16px; }
-
-        /* تكبير الصورة */
-        #lightbox {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9);
-            display: none; justify-content: center; align-items: center; z-index: 2000;
-        }
-        #lightbox img { max-width: 95%; max-height: 95%; border-radius: 5px; }
-        #lightbox-close { position: absolute; top: 20px; left: 20px; color: white; font-size: 30px; cursor: pointer; }
+        .modal input { width: 100%; padding: 12px; margin: 8px 0; border-radius: 8px; border: 1px solid #ccc; box-sizing: border-box; text-align: center; }
+        
+        /* معاينة وتكبير الصورة */
+        #preview-container { display: none; position: relative; width: fit-content; margin-bottom: 10px; }
+        #img-preview { max-width: 100px; max-height: 100px; border-radius: 10px; border: 2px solid var(--primary); }
+        #lightbox { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); display: none; justify-content: center; align-items: center; z-index: 2000; }
+        #lightbox img { max-width: 95%; max-height: 95%; }
     </style>
 </head>
 <body data-theme="light">
 
-    <div class="controls">
-        <button class="outline" onclick="toggleTheme()">🌗</button>
-        <button id="btn-login" onclick="openLogin()">🔒 دخول</button>
-        <button id="btn-logout" class="danger" style="display:none" onclick="logout()">🔓 خروج</button>
-        <button id="btn-clear" class="danger" style="display:none" onclick="clearLog()">🗑️ مسح</button>
+    <div id="lock-screen">
+        <div class="lock-icon">🔒</div>
+        <h2>المحتوى محمي</h2>
+        <p style="color:var(--text-sub)">يجب تسجيل الدخول لعرض غرفة العمليات</p>
+        <button onclick="openLogin()">تسجيل الدخول</button>
     </div>
 
-    <div class="container">
+    <div class="controls" id="app-controls" style="display:none">
+        <button class="outline" onclick="toggleTheme()">🌗</button>
+        <button class="danger" onclick="logout()">🔓 خروج</button>
+        <button class="danger" onclick="clearLog()">🗑️ مسح</button>
+    </div>
+
+    <div class="container" id="app-container">
         <div class="sticky-board">
-            <div class="board-title">
-                <span>📌 تنبيهات مثبتة</span>
-                <span id="save-status" style="display:none; color:green; font-size:0.7rem">جاري الحفظ...</span>
-            </div>
-            <div id="sticky-content" contenteditable="false" dir="auto">...</div>
+            <div class="board-title"><span>📌 تنبيهات مثبتة</span><span id="save-status" style="display:none;color:green">تم الحفظ</span></div>
+            <div id="sticky-content" contenteditable="true" dir="auto">...</div>
         </div>
 
-        <div class="input-area" id="input-box">
-            
+        <div class="input-area">
             <div id="preview-container">
-                <span id="remove-img" onclick="removeImage()">×</span>
+                <span onclick="removeImage()" style="position:absolute;top:-8px;left:-8px;background:red;color:white;border-radius:50%;width:20px;height:20px;cursor:pointer;line-height:20px;font-weight:bold">×</span>
                 <img id="img-preview" src="">
             </div>
-
             <textarea id="msg-text" placeholder="اكتب ملاحظة..." dir="auto"></textarea>
-            
             <div class="input-tools">
-                <div class="tool-group">
-                    <input type="file" id="file-input" accept="image/*" style="display: none;" onchange="handleFileSelect(event)">
-                    <button class="outline" onclick="document.getElementById('file-input').click()" title="إرفاق صورة">📷</button>
-                    
-                    <select id="msg-type">
-                        <option value="normal">📝 عادي</option>
-                        <option value="important">⚠️ هام</option>
-                        <option value="urgent">🚨 طارئ</option>
-                    </select>
+                <div style="display:flex; gap:5px">
+                    <input type="file" id="file-input" accept="image/*" style="display:none" onchange="handleFileSelect(event)">
+                    <button class="outline" onclick="document.getElementById('file-input').click()">📷</button>
+                    <select id="msg-type" style="padding:8px;border-radius:20px;border:1px solid #ccc"><option value="normal">📝</option><option value="important">⚠️</option><option value="urgent">🚨</option></select>
                 </div>
-                <button onclick="sendMessage()" style="min-width: 80px;">إرسال</button>
+                <button onclick="sendMessage()">إرسال</button>
             </div>
         </div>
 
@@ -179,16 +150,12 @@
         </div>
     </div>
 
-    <div id="lightbox" onclick="this.style.display='none'">
-        <span id="lightbox-close">&times;</span>
-        <img id="lightbox-img" src="">
-    </div>
+    <div id="lightbox" onclick="this.style.display='none'"><img id="lightbox-img" src=""></div>
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-        import { getDatabase, ref, set, push, onValue, remove } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
+        import { getDatabase, ref, set, push, onValue, remove, off } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
         import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
-
        const firebaseConfig = {
   apiKey: "AIzaSyC12wP3jPuylQzJe2HNaiDFJgNSMf50jaI",
   authDomain: "steps4u-aea0c.firebaseapp.com",
@@ -207,40 +174,76 @@
         const messagesRef = ref(db, 'ops_room/messages');
 
         let currentUser = null;
-        let selectedImageBase64 = null; // متغير لحفظ الصورة المختارة
+        let selectedImageBase64 = null;
 
-        // مراقبة الدخول
+        // ✅ نظام الأمان: لا نجلب البيانات إلا بعد تسجيل الدخول
         onAuthStateChanged(auth, (user) => {
             currentUser = user;
-            const sticky = document.getElementById('sticky-content');
-            const inputBox = document.getElementById('input-box');
-            
+            const lockScreen = document.getElementById('lock-screen');
+            const appContainer = document.getElementById('app-container');
+            const appControls = document.getElementById('app-controls');
+
             if (user) {
-                document.getElementById('btn-login').style.display = 'none';
-                document.getElementById('btn-logout').style.display = 'block';
-                document.getElementById('btn-clear').style.display = 'block';
-                inputBox.style.display = 'flex';
-                sticky.setAttribute('contenteditable', 'true');
+                // المستخدم مسجل: إظهار المحتوى وتشغيل الاتصال بالبيانات
+                lockScreen.style.display = 'none';
+                appContainer.style.display = 'flex';
+                appControls.style.display = 'flex';
+                startListening(); // 👈 تفعيل الاستماع للبيانات الآن فقط
             } else {
-                document.getElementById('btn-login').style.display = 'block';
-                document.getElementById('btn-logout').style.display = 'none';
-                document.getElementById('btn-clear').style.display = 'none';
-                inputBox.style.display = 'none';
-                sticky.setAttribute('contenteditable', 'false');
+                // المستخدم غير مسجل: قفل الشاشة وقطع الاتصال
+                lockScreen.style.display = 'flex';
+                appContainer.style.display = 'none';
+                appControls.style.display = 'none';
+                stopListening(); // 👈 قطع الاتصال بالبيانات
+                closeLogin(); // إغلاق النافذة إذا كانت مفتوحة
             }
         });
 
-        // =================== دوال الصور ===================
-        
-        // 1. عند اختيار ملف من الجهاز
-        window.handleFileSelect = function(event) {
-            const file = event.target.files[0];
+        // دوال الاستماع للبيانات (يتم استدعاؤها فقط بعد الدخول)
+        function startListening() {
+            // اللوحة الثابتة
+            onValue(stickyRef, (snapshot) => {
+                const text = snapshot.val();
+                const el = document.getElementById('sticky-content');
+                if (document.activeElement !== el) el.innerText = text || "لا توجد تنبيهات.";
+            });
+
+            // الرسائل
+            onValue(messagesRef, (snapshot) => {
+                const feed = document.getElementById('log-feed');
+                feed.innerHTML = '';
+                const data = snapshot.val();
+                if (data) {
+                    const msgList = Object.values(data).sort((a, b) => b.fullDate - a.fullDate);
+                    msgList.forEach(msg => {
+                        const card = document.createElement('div');
+                        card.className = `message-card msg-${msg.type}`;
+                        let imgHTML = msg.image ? `<img src="${msg.image}" class="msg-image" onclick="openLightbox(this.src)">` : '';
+                        card.innerHTML = `
+                            <div class="msg-header"><span class="sender-name">👤 ${msg.sender}</span><span>${msg.timestamp} 🕒</span></div>
+                            <div class="msg-content" dir="auto">${msg.content}</div>${imgHTML}
+                        `;
+                        feed.appendChild(card);
+                    });
+                }
+            });
+        }
+
+        // قطع الاتصال عند الخروج (لتنظيف الذاكرة ومنع الأخطاء)
+        function stopListening() {
+            off(stickyRef);
+            off(messagesRef);
+            document.getElementById('log-feed').innerHTML = '';
+            document.getElementById('sticky-content').innerText = '';
+        }
+
+        // دوال الصور والإرسال
+        window.handleFileSelect = (e) => {
+            const file = e.target.files[0];
             if (file) {
-                // ضغط الصورة قبل العرض (لتجنب ملء قاعدة البيانات)
                 const reader = new FileReader();
-                reader.onload = function(e) {
-                    selectedImageBase64 = e.target.result;
-                    // عرض المعاينة
+                reader.onload = (ev) => {
+                    selectedImageBase64 = ev.target.result;
                     document.getElementById('img-preview').src = selectedImageBase64;
                     document.getElementById('preview-container').style.display = 'block';
                 };
@@ -248,109 +251,47 @@
             }
         }
 
-        // 2. إلغاء الصورة المختارة
-        window.removeImage = function() {
+        window.removeImage = () => {
             selectedImageBase64 = null;
-            document.getElementById('file-input').value = ""; // تصفير الملف
+            document.getElementById('file-input').value = "";
             document.getElementById('preview-container').style.display = 'none';
         }
-
-        // 3. تكبير الصورة عند الضغط
-        window.openLightbox = function(src) {
-            document.getElementById('lightbox-img').src = src;
-            document.getElementById('lightbox').style.display = 'flex';
-        }
-
-        // =================== دوال الإرسال ===================
 
         window.sendMessage = () => {
             const textEl = document.getElementById('msg-text');
             const typeEl = document.getElementById('msg-type');
             const text = textEl.value.trim();
-
-            // يجب أن يكون هناك نص أو صورة على الأقل
             if ((!text && !selectedImageBase64) || !currentUser) return;
-
+            
             const senderName = currentUser.email.split('@')[0];
             const time = new Date().toLocaleTimeString('ar-EG', { hour: '2-digit', minute: '2-digit' });
-
+            
             push(messagesRef, {
-                sender: senderName,
-                content: text,
-                image: selectedImageBase64, // إرسال كود الصورة
-                type: typeEl.value,
-                timestamp: time,
-                fullDate: Date.now()
+                sender: senderName, content: text, image: selectedImageBase64, type: typeEl.value, timestamp: time, fullDate: Date.now()
             });
-
-            // تنظيف الحقول
-            textEl.value = '';
-            removeImage();
+            textEl.value = ''; removeImage();
         };
 
-        // عرض الرسائل
-        onValue(messagesRef, (snapshot) => {
-            const feed = document.getElementById('log-feed');
-            feed.innerHTML = '';
-            const data = snapshot.val();
-
-            if (data) {
-                const msgList = Object.values(data).sort((a, b) => b.fullDate - a.fullDate);
-                
-                msgList.forEach(msg => {
-                    const card = document.createElement('div');
-                    card.className = `message-card msg-${msg.type}`;
-                    
-                    // تحضير كود الصورة إذا وجدت
-                    let imgHTML = '';
-                    if(msg.image) {
-                        imgHTML = `<img src="${msg.image}" class="msg-image" onclick="openLightbox(this.src)">`;
-                    }
-
-                    card.innerHTML = `
-                        <div class="msg-header">
-                            <span class="sender-name">👤 ${msg.sender}</span>
-                            <span>${msg.timestamp} 🕒</span>
-                        </div>
-                        <div class="msg-content" dir="auto">${msg.content}</div>
-                        ${imgHTML}
-                    `;
-                    feed.appendChild(card);
-                });
-            } else {
-                feed.innerHTML = '<p style="text-align:center; color:#888; font-size:0.9rem">لا توجد رسائل.</p>';
-            }
-        });
-
-        // اللوحة الثابتة
-        onValue(stickyRef, (snapshot) => {
-            const text = snapshot.val();
-            const el = document.getElementById('sticky-content');
-            if (document.activeElement !== el) el.innerText = text || "لا توجد تنبيهات.";
-        });
-
+        // اللوحة الثابتة (حفظ)
         document.getElementById('sticky-content').addEventListener('input', (e) => {
             if (!currentUser) return;
             document.getElementById('save-status').style.display = 'inline';
-            set(stickyRef, e.target.innerText).then(() => {
-                setTimeout(() => document.getElementById('save-status').style.display = 'none', 1000);
-            });
+            set(stickyRef, e.target.innerText).then(() => setTimeout(() => document.getElementById('save-status').style.display = 'none', 1000));
         });
 
-        // دوال مساعدة
+        // دوال التحكم
         window.login = () => {
             const e = document.getElementById('email').value;
             const p = document.getElementById('password').value;
-            signInWithEmailAndPassword(auth, e, p).then(() => closeLogin()).catch(err => alert("خطأ: " + err.message));
+            signInWithEmailAndPassword(auth, e, p).catch(err => alert("خطأ: " + err.message));
         };
         window.logout = () => signOut(auth);
-        window.clearLog = () => { if(confirm("مسح السجل بالكامل؟")) remove(messagesRef); };
+        window.clearLog = () => { if(confirm("مسح السجل؟")) remove(messagesRef); };
         window.openLogin = () => document.getElementById('loginModal').style.display = 'flex';
         window.closeLogin = () => document.getElementById('loginModal').style.display = 'none';
-        window.toggleTheme = () => {
-            const body = document.body;
-            body.setAttribute('data-theme', body.getAttribute('data-theme') === 'dark' ? 'light' : 'dark');
-        };
+        window.openLightbox = (src) => { document.getElementById('lightbox-img').src = src; document.getElementById('lightbox').style.display = 'flex'; };
+        window.toggleTheme = () => { const b = document.body; b.setAttribute('data-theme', b.getAttribute('data-theme') === 'dark' ? 'light' : 'dark'); };
+
     </script>
 </body>
 </html>
