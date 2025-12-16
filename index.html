@@ -155,8 +155,8 @@
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
         import { getDatabase, ref, set, push, onValue, remove, off } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
-        import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
-       const firebaseConfig = {
+        import {
+const firebaseConfig = {
   apiKey: "AIzaSyC12wP3jPuylQzJe2HNaiDFJgNSMf50jaI",
   authDomain: "steps4u-aea0c.firebaseapp.com",
   databaseURL: "https://steps4u-aea0c-default-rtdb.firebaseio.com",
@@ -165,8 +165,7 @@
   messagingSenderId: "316135301602",
   appId: "1:316135301602:web:2f9a119f50093e8ac899bb",
   measurementId: "G-S27FV5E84B"
-};
-
+};		getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
         const app = initializeApp(firebaseConfig);
         const db = getDatabase(app);
         const auth = getAuth(app);
