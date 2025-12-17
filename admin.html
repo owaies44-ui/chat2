@@ -6,7 +6,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700&display=swap" rel="stylesheet">
     <style>
         body { font-family: 'Cairo', sans-serif; background: #f4f6f9; padding: 20px; }
-        .container { max-width: 1000px; margin: 0 auto; }
+        .container { max-width: 1000px; margin: 0 auto; display: none; /* مخفي حتى التحقق */ }
         
         h1 { color: #2c3e50; text-align: center; }
         
@@ -28,22 +28,40 @@
 </head>
 <body>
 
-    <div class="container">
+    <div class="container" id="admin-content">
         <h1>👮‍♂️ لوحة التحكم والإدارة</h1>
 
         <div class="stat-box">
             <div class="stat">عدد المستخدمين<span id="user-count">0</span></div>
             <div class="stat" style="background:#27ae60">رسائل الشات العام<span id="msg-count">0</span></div>
         </div>
+        
+        <div class="card">
+            <h2 style="border-color:orange; color:orange">📝 طلبات الانضمام الجديدة</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>الاسم</th>
+                        <th>الإيميل</th>
+                        <th>السبب</th>
+                        <th>التاريخ</th>
+                        <th>إجراء</th>
+                    </tr>
+                </thead>
+                <tbody id="requests-table">
+                    <tr><td colspan="5">لا توجد طلبات جديدة</td></tr>
+                </tbody>
+            </table>
+        </div>
 
         <div class="card">
-            <h2>👥 إدارة المستخدمين</h2>
+            <h2>👥 إدارة المستخدمين الحاليين</h2>
             <table>
                 <thead>
                     <tr>
                         <th>الاسم</th>
                         <th>البريد الإلكتروني</th>
-                        <th>User ID (UID)</th>
+                        <th>User ID</th>
                         <th>إجراءات</th>
                     </tr>
                 </thead>
@@ -70,113 +88,111 @@
             </table>
         </div>
     </div>
-<script type="module">
+
+    <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
         import { getDatabase, ref, onValue, remove } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
         import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
-const firebaseConfig = {
-  apiKey: "AIzaSyC12wP3jPuylQzJe2HNaiDFJgNSMf50jaI",
-  authDomain: "steps4u-aea0c.firebaseapp.com",
-  databaseURL: "https://steps4u-aea0c-default-rtdb.firebaseio.com",
-  projectId: "steps4u-aea0c",
-  storageBucket: "steps4u-aea0c.firebasestorage.app",
-  messagingSenderId: "316135301602",
-  appId: "1:316135301602:web:2f9a119f50093e8ac899bb",
-  measurementId: "G-S27FV5E84B"
+
+      const firebaseConfig = {
+  apiKey: "AIzaSyCjclCgnbj-dIfLWsCV39ytLvHmMwX9Oj8",
+  authDomain: "myweeklyschedule-7f3da.firebaseapp.com",
+  databaseURL: "https://myweeklyschedule-7f3da-default-rtdb.firebaseio.com",
+  projectId: "myweeklyschedule-7f3da",
+  storageBucket: "myweeklyschedule-7f3da.firebasestorage.app",
+  messagingSenderId: "752443312256",
+  appId: "1:752443312256:web:954239c4c12b1d8f92fe65"
 };
+        // ===========================================
 
         const app = initializeApp(firebaseConfig);
         const db = getDatabase(app);
         const auth = getAuth(app);
 
-        // 🔐 أهم جزء: الانتظار حتى يتأكد النظام أنك مسجل دخول
+        // 👇👇 ضع إيميلك هنا (الشخص الوحيد المسموح له) 👇👇
+        const ALLOWED_ADMIN = "owaies@user.com"; 
+
         onAuthStateChanged(auth, (user) => {
-            if (user) {
-                // المستخدم مسجل دخول -> الآن يمكننا جلب البيانات
-                console.log("Logged in as: ", user.email);
+            if (user && user.email === ALLOWED_ADMIN) {
+                // ✅ المستخدم هو الأدمن الحقيقي
+                document.getElementById('admin-content').style.display = 'block';
+                console.log("Welcome Admin!");
+                
                 loadUsers();
                 loadMessages();
+                loadRequests(); // دالة جديدة لعرض طلبات الانضمام
             } else {
-                // غير مسجل دخول -> تحذير وإعادة للصفحة الرئيسية
-                alert("يجب عليك تسجيل الدخول أولاً للوصول لهذه الصفحة!");
-                window.location.href = "index.html"; 
+                // ⛔ شخص آخر يحاول الدخول
+                document.body.innerHTML = "<h1 style='text-align:center; margin-top:50px; color:red'>⛔ غير مصرح لك بدخول هذه الصفحة!</h1>";
+                setTimeout(() => {
+                    window.location.href = "index.html"; // طرده للصفحة الرئيسية
+                }, 2000);
             }
         });
 
-        // 1. دالة عرض المستخدمين
+        // 1. عرض المستخدمين
         function loadUsers() {
-            const usersRef = ref(db, 'users');
-            onValue(usersRef, (snapshot) => {
+            onValue(ref(db, 'users'), (snapshot) => {
                 const table = document.getElementById('users-table');
                 const data = snapshot.val();
-                table.innerHTML = ''; // تنظيف الجدول
-
+                table.innerHTML = '';
                 if (data) {
                     document.getElementById('user-count').innerText = Object.keys(data).length;
                     Object.values(data).forEach(user => {
-                        const row = `
-                            <tr>
-                                <td>${user.name || 'بدون اسم'}</td>
-                                <td>${user.email}</td>
-                                <td style="font-family:monospace; font-size:0.8rem">${user.uid}</td>
-                                <td><button class="btn-delete" onclick="window.deleteUser('${user.uid}')">حذف</button></td>
-                            </tr>
-                        `;
+                        const row = `<tr><td>${user.name}</td><td>${user.email}</td><td style="font-size:0.8rem">${user.uid}</td><td><button class="btn-delete" onclick="window.deleteUser('${user.uid}')">حذف</button></td></tr>`;
                         table.innerHTML += row;
                     });
-                } else {
-                    table.innerHTML = '<tr><td colspan="4" style="text-align:center">لا يوجد مستخدمين مسجلين</td></tr>';
                 }
-            }, (error) => {
-                console.error("Error loading users:", error);
-                alert("لا تملك صلاحية لعرض المستخدمين: " + error.message);
             });
         }
 
-        // 2. دالة عرض الرسائل العامة
+        // 2. عرض الرسائل
         function loadMessages() {
-            const chatRef = ref(db, 'public_chat_messages');
-            onValue(chatRef, (snapshot) => {
+            onValue(ref(db, 'public_chat_messages'), (snapshot) => {
                 const table = document.getElementById('msgs-table');
                 const data = snapshot.val();
                 table.innerHTML = '';
-
                 if (data) {
-                    const msgs = Object.entries(data).reverse(); // الأحدث أولاً
+                    const msgs = Object.entries(data).reverse();
                     document.getElementById('msg-count').innerText = msgs.length;
-
                     msgs.forEach(([key, msg]) => {
                         const content = msg.image ? '📷 [صورة]' : msg.text;
-                        const row = `
-                            <tr>
-                                <td>${msg.senderName || 'مجهول'}</td>
-                                <td>${content}</td>
-                                <td>${msg.time}</td>
-                                <td><button class="btn-delete" onclick="window.deleteMsg('${key}')">حذف</button></td>
-                            </tr>
-                        `;
+                        const row = `<tr><td>${msg.senderName}</td><td>${content}</td><td>${msg.time}</td><td><button class="btn-delete" onclick="window.deleteMsg('${key}')">حذف</button></td></tr>`;
                         table.innerHTML += row;
                     });
-                } else {
-                    table.innerHTML = '<tr><td colspan="4" style="text-align:center">لا توجد رسائل</td></tr>';
                 }
             });
         }
 
-        // دوال الحذف (مربوطة بالنافذة مباشرة)
-        window.deleteUser = (uid) => {
-            if(confirm('هل أنت متأكد من حذف هذا المستخدم من القائمة؟')) {
-                remove(ref(db, 'users/' + uid))
-                .then(() => alert("تم الحذف بنجاح"))
-                .catch(err => alert("خطأ: " + err.message));
-            }
-        };
+        // 3. عرض طلبات الانضمام (الجديدة)
+        function loadRequests() {
+            onValue(ref(db, 'account_requests'), (snapshot) => {
+                const table = document.getElementById('requests-table');
+                const data = snapshot.val();
+                table.innerHTML = '';
+                if (data) {
+                    Object.entries(data).forEach(([key, req]) => {
+                        const row = `
+                            <tr>
+                                <td>${req.name}</td>
+                                <td>${req.email}</td>
+                                <td>${req.reason}</td>
+                                <td>${req.date || '-'}</td>
+                                <td><button class="btn-delete" style="background:green" onclick="alert('انسخ الإيميل واذهب لصفحة Authentication لإضافته يدوياً')">نسخ للإضافة</button> 
+                                    <button class="btn-delete" onclick="window.deleteReq('${key}')">حذف</button></td>
+                            </tr>`;
+                        table.innerHTML += row;
+                    });
+                } else {
+                    table.innerHTML = '<tr><td colspan="5" style="text-align:center">لا توجد طلبات جديدة</td></tr>';
+                }
+            });
+        }
 
-        window.deleteMsg = (key) => {
-            if(confirm('حذف هذه الرسالة؟')) {
-                remove(ref(db, 'public_chat_messages/' + key));
-            }
-        };
+        // دوال الحذف
+        window.deleteUser = (uid) => { if(confirm('حذف المستخدم؟')) remove(ref(db, 'users/' + uid)); };
+        window.deleteMsg = (key) => { if(confirm('حذف الرسالة؟')) remove(ref(db, 'public_chat_messages/' + key)); };
+        window.deleteReq = (key) => { if(confirm('حذف الطلب؟')) remove(ref(db, 'account_requests/' + key)); };
 
     </script>
 </body>
