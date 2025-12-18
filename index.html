@@ -6,7 +6,35 @@
     <title>شات المشرفين 💬</title>
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap" rel="stylesheet">
     
-    <style>
+    <style>/* تعريف الألوان الأساسية */
+        :root {
+            --bg-body: #f0f2f5;
+            --bg-card: #ffffff;
+            --text-main: #000000;
+            --msg-me: #dcf8c6;
+            --msg-other: #ffffff;
+        }
+
+        /* تعريف ألوان الوضع المظلم */
+        [data-theme="dark"] {
+            --bg-body: #111b21;       /* خلفية سوداء */
+            --bg-card: #202c33;       /* خلفية القوائم */
+            --text-main: #e9edef;     /* نص أبيض */
+            --msg-me: #005c4b;        /* رسالتي (أخضر غامق) */
+            --msg-other: #202c33;     /* رسالة الآخرين (رمادي غامق) */
+        }
+
+        /* تطبيق المتغيرات على العناصر */
+        body { background: var(--bg-body); color: var(--text-main); transition: 0.3s; }
+        .sidebar, .chat-header, .input-zone { background: var(--bg-card) !important; color: var(--text-main); }
+        .user-item:hover { background: rgba(255,255,255,0.1) !important; }
+        
+        /* ألوان الرسائل المتغيرة */
+        .msg-me { background: var(--msg-me) !important; color: var(--text-main); }
+        .msg-other { background: var(--msg-other) !important; color: var(--text-main); }
+        
+        /* تنسيق الأزرار الجديدة */
+        .icon-btn { cursor: pointer; background: transparent; border: none; font-size: 1.2rem; }
         :root { --primary: #0088cc; --bg-light: #f0f2f5; --my-msg: #dcf8c6; --special-bg: #e1f5fe; }
         body { font-family: 'Cairo', sans-serif; margin: 0; background: var(--bg-light); height: 100vh; display: flex; flex-direction: column; }
         
@@ -78,11 +106,15 @@
         </div>
     </div>
 
-    <div id="app-container">
-        <div class="sidebar" id="sidebar">
-            <div class="sidebar-header">
-                <span id="my-name">...</span>
-                <button onclick="logout()" style="width:auto; background:red; font-size:0.8rem">خروج</button>
+    <div id="app-container"><div class="sidebar-header">
+                <div style="display:flex; gap:10px; align-items:center">
+                    <span id="my-name">...</span>
+                    
+                    <button class="icon-btn" id="btn-sound" onclick="toggleMute()" title="كتم الصوت">🔔</button>
+                    <button class="icon-btn" id="btn-theme" onclick="toggleTheme()" title="الوضع الليلي">🌙</button>
+                    
+                    <button onclick="logout()" style="width:auto; background:red; font-size:0.8rem">خروج</button>
+                </div>
             </div>
             <div class="general-chat-btn" onclick="openPublicChat()">
                 <div class="user-avatar" style="background:#0277bd; color:white">📢</div>
@@ -110,6 +142,36 @@
     <div id="lightbox" onclick="this.style.display='none'"><img id="lightbox-img" src=""></div>
 
     <script type="module">
+	let isMuted = false; // هل الصوت مكتوم؟
+        
+        // دالة كتم/تشغيل الصوت
+        window.toggleMute = () => {
+            isMuted = !isMuted;
+            const btn = document.getElementById('btn-sound');
+            if (isMuted) {
+                btn.innerText = "🔕"; // أيقونة الكتم
+            } else {
+                btn.innerText = "🔔"; // أيقونة التشغيل
+                // تجربة الصوت للتأكيد
+                sendSound.currentTime = 0;
+                sendSound.play().catch(()=>{});
+            }
+        };
+
+        // دالة الوضع الليلي
+        window.toggleTheme = () => {
+            const body = document.body;
+            const btn = document.getElementById('btn-theme');
+            
+            // فحص الوضع الحالي والتبديل
+            if (body.getAttribute('data-theme') === 'dark') {
+                body.removeAttribute('data-theme'); // رجوع للنهار
+                btn.innerText = "🌙";
+            } else {
+                body.setAttribute('data-theme', 'dark'); // تفعيل الليل
+                btn.innerText = "☀️";
+            }
+        };
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
         import { getDatabase, ref, set, push, onValue, off } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
         import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
@@ -244,6 +306,10 @@ const receiveSound = new Audio('https://assets.mixkit.co/active_storage/sfx/2354
                 .catch((error) => alert("المتصفح منع الصوت: " + error.message));
 
             input.value = ''; 
+			if (!isMuted) {
+                sendSound.currentTime = 0;
+                sendSound.play().catch(e => console.log("الصوت محجوب"));
+            }
         };
 
         window.sendFile = (input) => {
