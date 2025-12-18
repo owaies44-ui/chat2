@@ -231,10 +231,19 @@ const receiveSound = new Audio('https://cdn.pixabay.com/audio/2022/03/10/audio_c
 
         window.sendMessage = () => {
             const input = document.getElementById('msg-input');
-            const text = input.value.trim();
+            const text = input.value.trim();// تأكد من وجود نص أو صورة
+            if (!text && !selectedImageBase64) return; // (أو المتغير الذي تستخدمه للصورة)
+
+            // إرسال البيانات
             sendData(text, null);
-			sendSound.play().catch(e => console.log("لم يتم تشغيل الصوت:", e));
-            input.value = '';
+            
+            // 👇👇 كود تشغيل الصوت المطور 👇👇
+            sendSound.currentTime = 0; // إعادة الصوت للبداية (لسرعة التكرار)
+            sendSound.play()
+                .then(() => console.log("تم تشغيل الصوت 🔊"))
+                .catch((error) => alert("المتصفح منع الصوت: " + error.message));
+
+            input.value = ''; 
         };
 
         window.sendFile = (input) => {
