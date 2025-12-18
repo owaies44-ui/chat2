@@ -3,180 +3,197 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>شات المشرفين 💬</title>
+    <title>غرفة عمليات المشرفين 🛡️</title>
+    
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap" rel="stylesheet">
     
-    <style>/* تعريف الألوان الأساسية */
+    <style>
+        /* ================= الألوان والثيمات ================= */
         :root {
             --bg-body: #f0f2f5;
-            --bg-card: #ffffff;
+            --bg-sidebar: #ffffff;
+            --bg-chat: #e5ddd5;
             --text-main: #000000;
             --msg-me: #dcf8c6;
             --msg-other: #ffffff;
+            --primary: #0088cc;
+            --danger: #ff5252;
+            --border: #ddd;
         }
 
-        /* تعريف ألوان الوضع المظلم */
+        /* الوضع الليلي */
         [data-theme="dark"] {
-            --bg-body: #111b21;       /* خلفية سوداء */
-            --bg-card: #202c33;       /* خلفية القوائم */
-            --text-main: #e9edef;     /* نص أبيض */
-            --msg-me: #005c4b;        /* رسالتي (أخضر غامق) */
-            --msg-other: #202c33;     /* رسالة الآخرين (رمادي غامق) */
+            --bg-body: #0b141a;
+            --bg-sidebar: #111b21;
+            --bg-chat: #0b141a; /* خلفية واتساب الداكنة */
+            --text-main: #e9edef;
+            --msg-me: #005c4b;
+            --msg-other: #202c33;
+            --primary: #00a884;
+            --border: #2a3942;
         }
 
-        /* تطبيق المتغيرات على العناصر */
-        body { background: var(--bg-body); color: var(--text-main); transition: 0.3s; }
-        .sidebar, .chat-header, .input-zone { background: var(--bg-card) !important; color: var(--text-main); }
-        .user-item:hover { background: rgba(255,255,255,0.1) !important; }
-        
-        /* ألوان الرسائل المتغيرة */
-        .msg-me { background: var(--msg-me) !important; color: var(--text-main); }
-        .msg-other { background: var(--msg-other) !important; color: var(--text-main); }
-        
-        /* تنسيق الأزرار الجديدة */
-        .icon-btn { cursor: pointer; background: transparent; border: none; font-size: 1.2rem; }
-        :root { --primary: #0088cc; --bg-light: #f0f2f5; --my-msg: #dcf8c6; --special-bg: #e1f5fe; }
-        body { font-family: 'Cairo', sans-serif; margin: 0; background: var(--bg-light); height: 100vh; display: flex; flex-direction: column; }
+        /* ================= التنسيق العام ================= */
+        body { font-family: 'Cairo', sans-serif; margin: 0; background: var(--bg-body); color: var(--text-main); height: 100vh; display: flex; flex-direction: column; transition: 0.3s; overflow: hidden; }
+        button { cursor: pointer; font-family: inherit; }
         
         /* شاشة الدخول */
-        #login-screen { display: flex; height: 100vh; justify-content: center; align-items: center; background: #e5ddd5; }
-        .login-box { background: white; padding: 30px; border-radius: 10px; text-align: center; box-shadow: 0 4px 10px rgba(0,0,0,0.1); width: 90%; max-width: 350px; }
-        input, textarea { width: 100%; padding: 10px; margin: 10px 0; border: 1px solid #ddd; border-radius: 5px; box-sizing: border-box; text-align: center; font-family: 'Cairo'; }
-        button { width: 100%; padding: 10px; border: none; background: var(--primary); color: white; border-radius: 5px; cursor: pointer; font-weight: bold; margin-top: 5px; }
-        
-        /* زر طلب الحساب */
-        .outline-btn { background: white; border: 1px solid var(--primary); color: var(--primary); margin-top: 10px; }
-        
-        /* النوافذ المنبثقة */
-        .modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); display: none; justify-content: center; align-items: center; z-index: 1000; }
-        .modal-content { background: white; padding: 25px; border-radius: 10px; width: 85%; max-width: 320px; text-align: center; }
+        #login-screen { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--bg-body); display: flex; flex-direction: column; justify-content: center; align-items: center; z-index: 2000; }
+        .login-box { background: var(--bg-sidebar); padding: 30px; border-radius: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); width: 90%; max-width: 350px; text-align: center; }
+        .login-box input, .modal input { width: 100%; padding: 12px; margin: 8px 0; border: 1px solid var(--border); border-radius: 8px; box-sizing: border-box; text-align: center; background: var(--bg-body); color: var(--text-main); }
+        .btn-main { width: 100%; padding: 12px; border: none; background: var(--primary); color: white; border-radius: 8px; font-weight: bold; margin-top: 10px; }
+        .btn-outline { background: transparent; border: 1px solid var(--primary); color: var(--primary); margin-top: 10px; width: 100%; padding: 10px; border-radius: 8px; }
 
-        /* بقية التنسيقات (كما هي) */
-        #app-container { display: none; height: 100vh; overflow: hidden; }
-        .sidebar { width: 30%; background: white; border-left: 1px solid #ddd; display: flex; flex-direction: column; }
-        .sidebar-header { padding: 15px; background: #eee; font-weight: bold; display: flex; justify-content: space-between; align-items: center; }
-        .general-chat-btn { padding: 15px; background: var(--special-bg); cursor: pointer; display: flex; align-items: center; gap: 10px; border-bottom: 2px solid #b3e5fc; font-weight: bold; color: #0277bd; }
-        .user-list { flex: 1; overflow-y: auto; }
-        .user-item { padding: 15px; border-bottom: 1px solid #f1f1f1; cursor: pointer; display: flex; align-items: center; gap: 10px; }
-        .user-avatar { width: 40px; height: 40px; background: #ddd; border-radius: 50%; display: flex; justify-content: center; align-items: center; font-size: 1.2rem; }
-        .chat-area { flex: 1; display: flex; flex-direction: column; background: #e5ddd5; position: relative; }
-        .chat-header { padding: 10px 15px; background: #eee; display: flex; align-items: center; gap: 10px; height: 60px; box-sizing: border-box; }
-        .chat-messages { flex: 1; overflow-y: auto; padding: 20px; display: flex; flex-direction: column; gap: 10px; }
-        .msg { max-width: 75%; padding: 8px 12px; border-radius: 8px; font-size: 0.95rem; position: relative; word-wrap: break-word; display: flex; flex-direction: column; }
-        .msg-me { align-self: flex-end; background: var(--my-msg); border-radius: 8px 0 8px 8px; }
-        .msg-other { align-self: flex-start; background: white; border-radius: 0 8px 8px 8px; }
-        .sender-label { font-size: 0.7rem; color: #e53935; font-weight: bold; margin-bottom: 2px; }
+        /* نافذة الطلب */
+        .modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); display: none; justify-content: center; align-items: center; z-index: 3000; }
+        
+        /* ================= تخطيط التطبيق ================= */
+        #app-container { display: none; height: 100vh; width: 100%; }
+        
+        /* القائمة الجانبية */
+        .sidebar { width: 30%; min-width: 250px; background: var(--bg-sidebar); border-left: 1px solid var(--border); display: flex; flex-direction: column; height: 100%; }
+        .sidebar-header { padding: 15px; background: var(--bg-sidebar); border-bottom: 1px solid var(--border); display: flex; flex-direction: column; gap: 10px; }
+        .user-info { display: flex; justify-content: space-between; align-items: center; font-weight: bold; }
+        
+        /* أزرار القائمة */
+        .chat-btn { padding: 12px; cursor: pointer; display: flex; align-items: center; gap: 10px; border-bottom: 1px solid var(--border); transition: 0.2s; }
+        .chat-btn:hover { background: rgba(0,0,0,0.05); }
+        .user-avatar { width: 40px; height: 40px; border-radius: 50%; display: flex; justify-content: center; align-items: center; background: #ddd; font-size: 1.2rem; }
+        
+        /* زر الطوارئ */
+        .emergency-btn { background: rgba(255, 0, 0, 0.1); color: red; border: 1px solid red; margin: 10px; border-radius: 8px; font-weight: bold; }
+        
+        /* منطقة الشات */
+        .chat-area { flex: 1; display: flex; flex-direction: column; background: var(--bg-chat); position: relative; }
+        .chat-header { padding: 10px 15px; background: var(--bg-sidebar); border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; height: 60px; }
+        
+        /* الرسائل */
+        .chat-messages { flex: 1; overflow-y: auto; padding: 15px; display: flex; flex-direction: column; gap: 8px; }
+        .msg { max-width: 75%; padding: 8px 12px; border-radius: 8px; font-size: 0.95rem; position: relative; word-wrap: break-word; display: flex; flex-direction: column; box-shadow: 0 1px 2px rgba(0,0,0,0.1); }
+        .msg-me { align-self: flex-end; background: var(--msg-me); border-radius: 8px 0 8px 8px; }
+        .msg-other { align-self: flex-start; background: var(--msg-other); border-radius: 0 8px 8px 8px; }
+        
+        /* تمييز رسالة الطوارئ */
+        .msg-emergency { background: #ffebee !important; border: 2px solid red; align-self: center; width: 90%; text-align: center; animation: shake 0.5s; }
+        @keyframes shake { 0% { transform: translate(1px, 1px); } 50% { transform: translate(-1px, -1px); } 100% { transform: translate(1px, 1px); } }
+
+        .sender-name { font-size: 0.7rem; color: var(--primary); font-weight: bold; margin-bottom: 2px; }
         .msg-time { font-size: 0.65rem; color: #999; align-self: flex-end; margin-top: 3px; }
         .msg-img { max-width: 100%; border-radius: 5px; margin-top: 5px; display: block; cursor: pointer; }
-        .input-zone { padding: 10px; background: #f0f0f0; display: flex; gap: 10px; align-items: center; }
-        .input-zone input { margin: 0; text-align: right; }
-        .icon-btn { background: none; color: #555; font-size: 1.2rem; width: auto; padding: 5px; }
+
+        /* منطقة الإدخال */
+        .input-zone { padding: 10px; background: var(--bg-sidebar); display: flex; gap: 8px; align-items: center; border-top: 1px solid var(--border); }
+        .input-zone input[type="text"] { flex: 1; padding: 10px; border-radius: 20px; border: 1px solid var(--border); background: var(--bg-body); color: var(--text-main); }
+        .icon-btn { background: none; border: none; font-size: 1.4rem; padding: 5px; color: #555; transition: transform 0.2s; }
+        [data-theme="dark"] .icon-btn { color: #ccc; }
+        .icon-btn:active { transform: scale(0.9); }
+        .pulse { animation: pulse 1s infinite; color: red !important; }
+        @keyframes pulse { 0% { transform: scale(1); } 50% { transform: scale(1.2); } 100% { transform: scale(1); } }
+
+        /* للجوال */
         @media (max-width: 768px) {
-            .sidebar { width: 100%; position: absolute; height: 100%; z-index: 2; transition: transform 0.3s; }
+            .sidebar { width: 100%; position: absolute; z-index: 100; transition: transform 0.3s; }
             .sidebar.hidden { transform: translateX(100%); }
-            .chat-area { width: 100%; }
             #back-btn { display: block !important; }
         }
-        #back-btn { display: none; }
-        #lightbox { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); display: none; justify-content: center; align-items: center; z-index: 2000; }
+        #back-btn { display: none; font-size: 1.5rem; background: none; border: none; color: var(--text-main); }
+
+        /* تكبير الصورة */
+        #lightbox { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); display: none; justify-content: center; align-items: center; z-index: 4000; }
         #lightbox img { max-width: 95%; max-height: 95%; }
     </style>
 </head>
-<body>
+<body data-theme="light">
 
     <div id="login-screen">
         <div class="login-box">
-            <h2>💬 شات المشرفين</h2>
+            <h2>🛡️ غرفة المشرفين</h2>
             <input type="email" id="email" placeholder="البريد الإلكتروني">
             <input type="password" id="password" placeholder="كلمة المرور">
-            <button id="login-btn">دخول</button>
-            
-            <button class="outline-btn" onclick="document.getElementById('request-modal').style.display='flex'">طلب حساب جديد</button>
+            <button class="btn-main" id="btn-login-action">تسجيل الدخول</button>
+            <button class="btn-outline" onclick="document.getElementById('request-modal').style.display='flex'">طلب حساب جديد</button>
         </div>
     </div>
 
     <div id="request-modal" class="modal">
-        <div class="modal-content">
-            <h3>📝 طلب الانضمام</h3>
+        <div class="login-box">
+            <h3>📝 طلب انضمام</h3>
             <input type="text" id="req-name" placeholder="الاسم الثلاثي">
             <input type="email" id="req-email" placeholder="البريد الإلكتروني">
-            <input type="text" id="req-reason" placeholder="سبب الطلب / المنصب">
-            <button onclick="sendAccountRequest()">إرسال الطلب</button>
-            <button class="outline-btn" onclick="document.getElementById('request-modal').style.display='none'">إلغاء</button>
+            <input type="text" id="req-reason" placeholder="المسمى الوظيفي / السبب">
+            <button class="btn-main" onclick="sendAccountRequest()">إرسال الطلب</button>
+            <button class="btn-outline" style="border:none; color:red" onclick="document.getElementById('request-modal').style.display='none'">إلغاء</button>
         </div>
     </div>
 
-    <div id="app-container"><div class="sidebar-header">
-                <div style="display:flex; gap:10px; align-items:center">
+    <div id="app-container">
+        
+        <div class="sidebar" id="sidebar">
+            <div class="sidebar-header">
+                <div class="user-info">
                     <span id="my-name">...</span>
-                    
-                    <button class="icon-btn" id="btn-sound" onclick="toggleMute()" title="كتم الصوت">🔔</button>
-                    <button class="icon-btn" id="btn-theme" onclick="toggleTheme()" title="الوضع الليلي">🌙</button>
-                    
-                    <button onclick="logout()" style="width:auto; background:red; font-size:0.8rem">خروج</button>
+                    <div style="display:flex; gap:5px">
+                        <button class="icon-btn" onclick="logout()" title="خروج">🚪</button>
+                    </div>
                 </div>
+                <button id="admin-panel-btn" class="btn-main" style="display:none; background:#2c3e50; font-size:0.9rem" onclick="window.location.href='admin.html'">⚙️ لوحة التحكم</button>
             </div>
-            <div class="general-chat-btn" onclick="openPublicChat()">
-                <div class="user-avatar" style="background:#0277bd; color:white">📢</div>
+
+            <div class="chat-btn" onclick="openPublicChat()" style="background:rgba(0,136,204,0.1)">
+                <div class="user-avatar" style="background:var(--primary); color:white">📢</div>
                 <span>المحادثة العامة</span>
             </div>
-            <div class="user-list" id="users-list"></div>
+
+            <div class="chat-btn emergency-btn" onclick="triggerEmergency()">
+                <div class="user-avatar" style="background:red; color:white">🚨</div>
+                <span>تبليغ عن طوارئ</span>
+            </div>
+
+            <div style="padding:10px; font-weight:bold; color:gray; font-size:0.8rem">المشرفين:</div>
+            <div id="users-list" style="overflow-y:auto; flex:1"></div>
         </div>
 
         <div class="chat-area">
-            <div class="chat-header" id="chat-header" style="display:flex">
-                <button id="back-btn" class="icon-btn" onclick="showSidebar()">➜</button>
-                <div class="user-avatar" id="current-chat-avatar">📢</div>
-                <span id="current-chat-name" style="font-weight:bold">المحادثة العامة</span>
+            <div class="chat-header">
+                <div style="display:flex; align-items:center; gap:10px">
+                    <button id="back-btn" onclick="showSidebar()">➜</button>
+                    <div class="user-avatar" id="current-chat-avatar">📢</div>
+                    <span id="current-chat-name" style="font-weight:bold">المحادثة العامة</span>
+                </div>
+                <div style="display:flex; gap:5px">
+                    <button class="icon-btn" id="btn-theme" onclick="toggleTheme()" title="الوضع الليلي">🌙</button>
+                    <button class="icon-btn" id="btn-mute" onclick="toggleMute()" title="كتم الصوت">🔔</button>
+                </div>
             </div>
+
             <div class="chat-messages" id="messages-box"></div>
-            <div class="input-zone" id="input-zone">
-                <button class="icon-btn" onclick="document.getElementById('file-input').click()">📷</button>
+
+            <div class="input-zone">
+                <button class="icon-btn" onclick="document.getElementById('file-input').click()" title="صورة">📷</button>
+                <button class="icon-btn" id="mic-btn" onclick="toggleVoice()" title="تحدث">🎤</button>
+                <button class="icon-btn" onclick="sendLocation()" title="موقعي">📍</button>
+                
                 <input type="file" id="file-input" accept="image/*" hidden onchange="sendFile(this)">
-                <input type="text" id="msg-input" placeholder="اكتب رسالة...">
-                <button class="icon-btn" onclick="sendMessage()">➤</button>
+                <input type="text" id="msg-input" placeholder="اكتب رسالة..." dir="auto">
+                <button class="icon-btn" onclick="sendMessage()" style="color:var(--primary)">➤</button>
             </div>
+            
+            <div id="recording-status" style="display:none; text-align:center; background:red; color:white; font-size:0.7rem">جاري التسجيل...</div>
         </div>
     </div>
-    
+
     <div id="lightbox" onclick="this.style.display='none'"><img id="lightbox-img" src=""></div>
 
     <script type="module">
-	let isMuted = false; // هل الصوت مكتوم؟
-        
-        // دالة كتم/تشغيل الصوت
-        window.toggleMute = () => {
-            isMuted = !isMuted;
-            const btn = document.getElementById('btn-sound');
-            if (isMuted) {
-                btn.innerText = "🔕"; // أيقونة الكتم
-            } else {
-                btn.innerText = "🔔"; // أيقونة التشغيل
-                // تجربة الصوت للتأكيد
-                sendSound.currentTime = 0;
-                sendSound.play().catch(()=>{});
-            }
-        };
-
-        // دالة الوضع الليلي
-        window.toggleTheme = () => {
-            const body = document.body;
-            const btn = document.getElementById('btn-theme');
-            
-            // فحص الوضع الحالي والتبديل
-            if (body.getAttribute('data-theme') === 'dark') {
-                body.removeAttribute('data-theme'); // رجوع للنهار
-                btn.innerText = "🌙";
-            } else {
-                body.setAttribute('data-theme', 'dark'); // تفعيل الليل
-                btn.innerText = "☀️";
-            }
-        };
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
         import { getDatabase, ref, set, push, onValue, off } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
         import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 
-      const firebaseConfig = {
+        // =======================================================
+        // 🔴🔴 استبدل البيانات هنا ببيانات مشروعك الحقيقية 🔴🔴
+		const firebaseConfig = {
   apiKey: "AIzaSyC12wP3jPuylQzJe2HNaiDFJgNSMf50jaI",
   authDomain: "steps4u-aea0c.firebaseapp.com",
   databaseURL: "https://steps4u-aea0c-default-rtdb.firebaseio.com",
@@ -186,78 +203,65 @@
   appId: "1:316135301602:web:2f9a119f50093e8ac899bb",
   measurementId: "G-S27FV5E84B"
 };
+        // =======================================================
+
+        // 👇👇 إيميل الأدمن (لإظهار زر التحكم له) 👇👇
+        const ADMIN_EMAIL = "owaies@user.com"; 
 
         const app = initializeApp(firebaseConfig);
         const db = getDatabase(app);
         const auth = getAuth(app);
-// رابط صوت الإرسال (صوت Pop خفيف)
-// رابط صوت "Pop" سريع وموثوق
-const sendSound = new Audio('https://assets.mixkit.co/active_storage/sfx/2354/2354-preview.mp3');
-const receiveSound = new Audio('https://assets.mixkit.co/active_storage/sfx/2354/2354-preview.mp3'); // صوت مختلف
+        
+        // المتغيرات العامة
         let currentUser = null;
         let activeChatRef = null;
+        let isMuted = false;
+        let recognition; // للكتابة الصوتية
 
-        // 1. مراقبة الدخول
+        // الصوت
+        const sendSound = new Audio('https://actions.google.com/sounds/v1/cartoon/pop.ogg');
+
+        // ================= 1. إدارة الدخول =================
+        document.getElementById('btn-login-action').addEventListener('click', () => {
+            const e = document.getElementById('email').value;
+            const p = document.getElementById('password').value;
+            signInWithEmailAndPassword(auth, e, p).catch(err => alert("خطأ: " + err.message));
+        });
+
         onAuthStateChanged(auth, (user) => {
             if (user) {
                 currentUser = user;
                 document.getElementById('login-screen').style.display = 'none';
                 document.getElementById('app-container').style.display = 'flex';
-                document.getElementById('my-name').innerText = "👤 " + user.email.split('@')[0];
+                document.getElementById('my-name').innerText = user.email.split('@')[0];
+                
+                // إذا كان أدمن أظهر الزر
+                if(user.email === ADMIN_EMAIL) {
+                    document.getElementById('admin-panel-btn').style.display = 'block';
+                }
+
                 saveUserToDB(user);
                 loadUsersList();
-                openPublicChat();
+                openPublicChat(); // الفتح الافتراضي
             } else {
                 document.getElementById('login-screen').style.display = 'flex';
                 document.getElementById('app-container').style.display = 'none';
             }
         });
 
-        // 2. دالة إرسال طلب الحساب (الجديدة)
-        window.sendAccountRequest = () => {
-            const name = document.getElementById('req-name').value;
-            const email = document.getElementById('req-email').value;
-            const reason = document.getElementById('req-reason').value;
-
-            if(!name || !email) {
-                alert("يرجى ملء الاسم والبريد الإلكتروني");
-                return;
-            }
-
-            // إرسال الطلب لقاعدة البيانات
-            push(ref(db, 'account_requests'), {
-                name: name,
-                email: email,
-                reason: reason,
-                timestamp: Date.now(),
-                date: new Date().toLocaleDateString('ar-EG')
-            })
-            .then(() => {
-                alert("✅ تم إرسال طلبك بنجاح!\nسيقوم المشرف بمراجعته وإنشاء الحساب قريباً.");
-                document.getElementById('request-modal').style.display = 'none';
-                // تصفير الحقول
-                document.getElementById('req-name').value = "";
-                document.getElementById('req-email').value = "";
-                document.getElementById('req-reason').value = "";
-            })
-            .catch((error) => {
-                alert("خطأ: " + error.message);
-            });
-        };
-
-        // ... (باقي كود المحادثات كما هو في النسخة السابقة) ...
+        // ================= 2. الشات والرسائل =================
+        window.openPublicChat = () => setupChat("المحادثة العامة", "📢", ref(db, 'public_chat_messages'));
         
-        window.openPublicChat = () => setupChatView("المحادثة العامة", "📢", ref(db, 'public_chat_messages'));
-
         window.openPrivateChat = (targetUser) => {
             const chatId = [currentUser.uid, targetUser.uid].sort().join('_');
-            setupChatView(targetUser.name, "👤", ref(db, 'private_chats/' + chatId));
+            setupChat(targetUser.name, "👤", ref(db, 'private_chats/' + chatId));
         };
 
-        function setupChatView(name, avatar, refPath) {
+        function setupChat(name, avatar, refPath) {
             document.getElementById('current-chat-name').innerText = name;
             document.getElementById('current-chat-avatar').innerText = avatar;
             if(window.innerWidth <= 768) document.getElementById('sidebar').classList.add('hidden');
+            
             if (activeChatRef) off(activeChatRef);
             activeChatRef = refPath;
             loadMessages();
@@ -265,27 +269,36 @@ const receiveSound = new Audio('https://assets.mixkit.co/active_storage/sfx/2354
 
         function loadMessages() {
             const box = document.getElementById('messages-box');
-            box.innerHTML = ''; 
+            box.innerHTML = '';
+            
             onValue(activeChatRef, (snapshot) => {
                 box.innerHTML = '';
                 const data = snapshot.val();
                 if (data) {
-                    Object.values(data).forEach(msg => {
+                    const msgs = Object.values(data);
+                    msgs.forEach(msg => {
                         const div = document.createElement('div');
                         const isMe = msg.senderId === currentUser.uid;
-						const msgs = Object.values(data);
-            const lastMsg = msgs[msgs.length - 1];
-                        div.className = `msg ${isMe ? 'msg-me' : 'msg-other'}`;
-                        let senderInfo = (!isMe) ? `<span class="sender-label">~ ${msg.senderName}</span>` : '';
+                        
+                        // فحص هل هي طوارئ؟
+                        const isEmergency = msg.text && msg.text.includes("🚨🚨");
+
+                        div.className = `msg ${isMe ? 'msg-me' : 'msg-other'} ${isEmergency ? 'msg-emergency' : ''}`;
+                        
+                        let senderInfo = (!isMe) ? `<span class="sender-name">~ ${msg.senderName}</span>` : '';
                         let content = `<div dir="auto">${msg.text}</div>`;
-						if (lastMsg.senderId !== currentUser.uid) {
-                 // هذا يعني أن شخصاً آخر أرسل الرسالة
-                 receiveSound.play().catch(e => console.log("Interact first"));
-            }
                         if (msg.image) content += `<img src="${msg.image}" class="msg-img" onclick="viewImage(this.src)">`;
+                        
                         div.innerHTML = `${senderInfo}${content}<span class="msg-time">${msg.time}</span>`;
                         box.appendChild(div);
                     });
+                    
+                    // تشغيل صوت عند الاستلام (لآخر رسالة فقط)
+                    const lastMsg = msgs[msgs.length-1];
+                    if(lastMsg.senderId !== currentUser.uid && !isMuted) {
+                        sendSound.currentTime = 0; sendSound.play().catch(()=>{});
+                    }
+
                     box.scrollTop = box.scrollHeight;
                 }
             });
@@ -293,23 +306,10 @@ const receiveSound = new Audio('https://assets.mixkit.co/active_storage/sfx/2354
 
         window.sendMessage = () => {
             const input = document.getElementById('msg-input');
-            const text = input.value.trim();// تأكد من وجود نص أو صورة
-            if (!text && !selectedImageBase64) return; // (أو المتغير الذي تستخدمه للصورة)
-
-            // إرسال البيانات
+            const text = input.value.trim();
+            if(!text) return;
             sendData(text, null);
-            
-            // 👇👇 كود تشغيل الصوت المطور 👇👇
-            sendSound.currentTime = 0; // إعادة الصوت للبداية (لسرعة التكرار)
-            sendSound.play()
-                .then(() => console.log("تم تشغيل الصوت 🔊"))
-                .catch((error) => alert("المتصفح منع الصوت: " + error.message));
-
-            input.value = ''; 
-			if (!isMuted) {
-                sendSound.currentTime = 0;
-                sendSound.play().catch(e => console.log("الصوت محجوب"));
-            }
+            input.value = '';
         };
 
         window.sendFile = (input) => {
@@ -321,8 +321,21 @@ const receiveSound = new Audio('https://assets.mixkit.co/active_storage/sfx/2354
             }
         };
 
+        window.sendLocation = () => {
+            if (!navigator.geolocation) return alert("جهازك لا يدعم GPS");
+            navigator.geolocation.getCurrentPosition(pos => {
+                const link = `https://maps.google.com/?q=${pos.coords.latitude},${pos.coords.longitude}`;
+                sendData(`📍 موقعي الحالي: <a href="${link}" target="_blank" style="color:blue">فتح الخريطة</a>`, null);
+            });
+        };
+
+        window.triggerEmergency = () => {
+            if(confirm("🚨 هل أنت متأكد من إرسال إنذار طوارئ للجميع؟")) {
+                sendData("🚨🚨 [[ حالة طوارئ قصوى ]] 🚨🚨 يرجى الانتباه!", null);
+            }
+        };
+
         function sendData(text, img) {
-            if (!text && !img) return;
             push(activeChatRef, {
                 senderId: currentUser.uid,
                 senderName: currentUser.email.split('@')[0],
@@ -331,7 +344,52 @@ const receiveSound = new Audio('https://assets.mixkit.co/active_storage/sfx/2354
                 time: new Date().toLocaleTimeString('ar-EG', {hour:'2-digit', minute:'2-digit'}),
                 timestamp: Date.now()
             });
+            if(!isMuted) { sendSound.currentTime = 0; sendSound.play().catch(()=>{}); }
         }
+
+        // ================= 3. الأدوات (صوت، ثيم، مايك) =================
+        
+        // الصوت
+        window.toggleMute = () => {
+            isMuted = !isMuted;
+            document.getElementById('btn-mute').innerText = isMuted ? "🔕" : "🔔";
+        };
+
+        // الثيم
+        window.toggleTheme = () => {
+            const b = document.body;
+            const isDark = b.getAttribute('data-theme') === 'dark';
+            b.setAttribute('data-theme', isDark ? 'light' : 'dark');
+            document.getElementById('btn-theme').innerText = isDark ? "🌙" : "☀️";
+        };
+
+        // الكتابة الصوتية
+        window.toggleVoice = () => {
+            if (!('webkitSpeechRecognition' in window)) return alert("المتصفح لا يدعم المايك، استخدم Chrome");
+            
+            if (!recognition) {
+                recognition = new webkitSpeechRecognition();
+                recognition.lang = 'ar-SA';
+                recognition.continuous = false;
+                recognition.onstart = () => {
+                    document.getElementById('mic-btn').classList.add('pulse');
+                    document.getElementById('recording-status').style.display = 'block';
+                };
+                recognition.onend = () => {
+                    document.getElementById('mic-btn').classList.remove('pulse');
+                    document.getElementById('recording-status').style.display = 'none';
+                };
+                recognition.onresult = (e) => {
+                    document.getElementById('msg-input').value += " " + e.results[0][0].transcript;
+                };
+            }
+            recognition.start();
+        };
+
+        // ================= 4. وظائف مساعدة =================
+        window.logout = () => signOut(auth).then(() => location.reload());
+        window.showSidebar = () => document.getElementById('sidebar').classList.remove('hidden');
+        window.viewImage = (src) => { document.getElementById('lightbox-img').src = src; document.getElementById('lightbox').style.display = 'flex'; };
 
         function saveUserToDB(user) {
             set(ref(db, 'users/' + user.uid), {
@@ -347,26 +405,30 @@ const receiveSound = new Audio('https://assets.mixkit.co/active_storage/sfx/2354
                 if (users) {
                     Object.values(users).forEach(u => {
                         if (u.uid === currentUser.uid) return;
-                        const item = document.createElement('div');
-                        item.className = 'user-item';
-                        item.innerHTML = `<div class="user-avatar">👤</div><span>${u.name}</span>`;
-                        item.onclick = () => openPrivateChat(u);
-                        list.appendChild(item);
+                        const div = document.createElement('div');
+                        div.className = 'chat-btn';
+                        div.innerHTML = `<div class="user-avatar">👤</div><span>${u.name}</span>`;
+                        div.onclick = () => openPrivateChat(u);
+                        list.appendChild(div);
                     });
                 }
             });
         }
 
-        const performLogin = () => {
-            const e = document.getElementById('email').value;
-            const p = document.getElementById('password').value;
-            signInWithEmailAndPassword(auth, e, p).catch(err => alert("خطأ: " + err.message));
+        // طلب الحساب
+        window.sendAccountRequest = () => {
+            const name = document.getElementById('req-name').value;
+            const email = document.getElementById('req-email').value;
+            const reason = document.getElementById('req-reason').value;
+            if(!name || !email) return alert("أكمل البيانات");
+            
+            push(ref(db, 'account_requests'), {
+                name, email, reason, date: new Date().toLocaleDateString()
+            }).then(() => {
+                alert("تم إرسال الطلب بنجاح");
+                document.getElementById('request-modal').style.display='none';
+            });
         };
-        document.getElementById('login-btn').addEventListener('click', performLogin);
-
-        window.logout = () => signOut(auth).then(() => location.reload());
-        window.showSidebar = () => document.getElementById('sidebar').classList.remove('hidden');
-        window.viewImage = (src) => { document.getElementById('lightbox-img').src = src; document.getElementById('lightbox').style.display = 'flex'; };
 
     </script>
 </body>
