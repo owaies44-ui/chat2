@@ -128,7 +128,10 @@
         const app = initializeApp(firebaseConfig);
         const db = getDatabase(app);
         const auth = getAuth(app);
-
+// رابط صوت الإرسال (صوت Pop خفيف)
+// رابط صوت "Pop" سريع وموثوق
+const sendSound = new Audio('https://actions.google.com/sounds/v1/cartoon/pop.ogg');
+const receiveSound = new Audio('https://cdn.pixabay.com/audio/2022/03/10/audio_c8c8a73467.mp3'); // صوت مختلف
         let currentUser = null;
         let activeChatRef = null;
 
@@ -208,9 +211,15 @@
                     Object.values(data).forEach(msg => {
                         const div = document.createElement('div');
                         const isMe = msg.senderId === currentUser.uid;
+						const msgs = Object.values(data);
+            const lastMsg = msgs[msgs.length - 1];
                         div.className = `msg ${isMe ? 'msg-me' : 'msg-other'}`;
                         let senderInfo = (!isMe) ? `<span class="sender-label">~ ${msg.senderName}</span>` : '';
                         let content = `<div dir="auto">${msg.text}</div>`;
+						if (lastMsg.senderId !== currentUser.uid) {
+                 // هذا يعني أن شخصاً آخر أرسل الرسالة
+                 receiveSound.play().catch(e => console.log("Interact first"));
+            }
                         if (msg.image) content += `<img src="${msg.image}" class="msg-img" onclick="viewImage(this.src)">`;
                         div.innerHTML = `${senderInfo}${content}<span class="msg-time">${msg.time}</span>`;
                         box.appendChild(div);
@@ -224,6 +233,7 @@
             const input = document.getElementById('msg-input');
             const text = input.value.trim();
             sendData(text, null);
+			sendSound.play().catch(e => console.log("لم يتم تشغيل الصوت:", e));
             input.value = '';
         };
 
