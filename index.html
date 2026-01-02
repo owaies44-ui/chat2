@@ -10,100 +10,246 @@
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap" rel="stylesheet">
     
     <style>
-        /* ================= الألوان والثيمات ================= */
-        :root {
-            --bg-body: #f0f2f5;
-            --bg-sidebar: #ffffff;
-            --bg-chat: #e5ddd5;
-            --text-main: #000000;
-            --msg-me: #dcf8c6;
-            --msg-other: #ffffff;
-            --primary: #0088cc;
-            --danger: #ff5252;
-            --border: #ddd;
-        }
+    /* ================= الألوان والمتغيرات العصرية ================= */
+    :root {
+        --primary-hue: 210; /* درجة اللون الأزرق الأساسي */
+        --primary: hsl(var(--primary-hue), 90%, 55%); /* أزرق نيون ساطع */
+        --primary-dark: hsl(var(--primary-hue), 90%, 40%);
+        --accent: #00d2ff; /* لون سماوي للإضاءات */
+        --danger: #ff4757;
+        
+        /* الوضع النهاري (Light Mode) - زجاجي ونظيف */
+        --bg-body: #f4f7f6;
+        --bg-glass: rgba(255, 255, 255, 0.7); /* خلفية زجاجية شبه شفافة */
+        --bg-card: #ffffff;
+        --text-main: #2d3436;
+        --text-muted: #636e72;
+        --msg-me-bg: linear-gradient(135deg, var(--primary), var(--accent));
+        --msg-me-text: #ffffff;
+        --msg-other-bg: #ffffff;
+        --border-color: rgba(0, 0, 0, 0.08);
+        --shadow-soft: 0 10px 30px rgba(0, 0, 0, 0.05);
+        --shadow-glass: 0 8px 32px 0 rgba(31, 38, 135, 0.15);
+    }
 
-        /* الوضع الليلي */
-        [data-theme="dark"] {
-            --bg-body: #0b141a;
-            --bg-sidebar: #111b21;
-            --bg-chat: #0b141a; /* خلفية واتساب الداكنة */
-            --text-main: #e9edef;
-            --msg-me: #005c4b;
-            --msg-other: #202c33;
-            --primary: #00a884;
-            --border: #2a3942;
-        }
+    /* الوضع الليلي (Dark Mode) - عميق وفاخر */
+    [data-theme="dark"] {
+        --bg-body: #0f172a; /* لون فحمي عميق جداً */
+        --bg-glass: rgba(30, 41, 59, 0.7); /* زجاج داكن */
+        --bg-card: #1e293b;
+        --text-main: #e2e8f0;
+        --text-muted: #94a3b8;
+        --msg-me-bg: linear-gradient(135deg, var(--primary-dark), var(--primary));
+        --msg-other-bg: #334155;
+        --border-color: rgba(255, 255, 255, 0.05);
+        --shadow-soft: 0 10px 30px rgba(0, 0, 0, 0.2);
+        --shadow-glass: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
+    }
 
-        /* ================= التنسيق العام ================= */
-        body { font-family: 'Cairo', sans-serif; margin: 0; background: var(--bg-body); color: var(--text-main); height: 100vh; display: flex; flex-direction: column; transition: 0.3s; overflow: hidden; }
-        button { cursor: pointer; font-family: inherit; }
-        
-        /* شاشة الدخول */
-        #login-screen { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--bg-body); display: flex; flex-direction: column; justify-content: center; align-items: center; z-index: 2000; }
-        .login-box { background: var(--bg-sidebar); padding: 30px; border-radius: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); width: 90%; max-width: 350px; text-align: center; }
-        .login-box input, .modal input { width: 100%; padding: 12px; margin: 8px 0; border: 1px solid var(--border); border-radius: 8px; box-sizing: border-box; text-align: center; background: var(--bg-body); color: var(--text-main); }
-        .btn-main { width: 100%; padding: 12px; border: none; background: var(--primary); color: white; border-radius: 8px; font-weight: bold; margin-top: 10px; }
-        .btn-outline { background: transparent; border: 1px solid var(--primary); color: var(--primary); margin-top: 10px; width: 100%; padding: 10px; border-radius: 8px; }
+    /* ================= التنسيق العام وإعادة الضبط ================= */
+    * { box-sizing: border-box; }
+    body { 
+        font-family: 'Cairo', sans-serif; 
+        margin: 0; 
+        background: var(--bg-body);
+        background-image: radial-gradient(circle at top right, rgba(var(--primary-hue), 90%, 55%, 0.05), transparent 40%),
+                          radial-gradient(circle at bottom left, rgba(0, 210, 255, 0.05), transparent 40%);
+        color: var(--text-main); 
+        height: 100vh; 
+        display: flex; 
+        flex-direction: column; 
+        transition: background 0.5s ease, color 0.5s ease;
+        overflow: hidden; 
+    }
+    button { cursor: pointer; font-family: inherit; transition: all 0.3s ease; }
+    
+    /* ================= تأثير الزجاج (Glassmorphism) ================= */
+    .glass-effect {
+        background: var(--bg-glass) !important;
+        backdrop-filter: blur(12px); /* هذا هو سر التأثير */
+        -webkit-backdrop-filter: blur(12px);
+        border: 1px solid var(--border-color);
+        box-shadow: var(--shadow-glass);
+    }
 
-        /* نافذة الطلب */
-        .modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); display: none; justify-content: center; align-items: center; z-index: 3000; }
-        
-        /* ================= تخطيط التطبيق ================= */
-        #app-container { display: none; height: 100vh; width: 100%; }
-        
-        /* القائمة الجانبية */
-        .sidebar { width: 30%; min-width: 250px; background: var(--bg-sidebar); border-left: 1px solid var(--border); display: flex; flex-direction: column; height: 100%; }
-        .sidebar-header { padding: 15px; background: var(--bg-sidebar); border-bottom: 1px solid var(--border); display: flex; flex-direction: column; gap: 10px; }
-        .user-info { display: flex; justify-content: space-between; align-items: center; font-weight: bold; }
-        
-        /* أزرار القائمة */
-        .chat-btn { padding: 12px; cursor: pointer; display: flex; align-items: center; gap: 10px; border-bottom: 1px solid var(--border); transition: 0.2s; }
-        .chat-btn:hover { background: rgba(0,0,0,0.05); }
-        .user-avatar { width: 40px; height: 40px; border-radius: 50%; display: flex; justify-content: center; align-items: center; background: #ddd; font-size: 1.2rem; }
-        
-        /* زر الطوارئ */
-        .emergency-btn { background: rgba(255, 0, 0, 0.1); color: red; border: 1px solid red; margin: 10px; border-radius: 8px; font-weight: bold; }
-        
-        /* منطقة الشات */
-        .chat-area { flex: 1; display: flex; flex-direction: column; background: var(--bg-chat); position: relative; }
-        .chat-header { padding: 10px 15px; background: var(--bg-sidebar); border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; height: 60px; }
-        
-        /* الرسائل */
-        .chat-messages { flex: 1; overflow-y: auto; padding: 15px; display: flex; flex-direction: column; gap: 8px; }
-        .msg { max-width: 75%; padding: 8px 12px; border-radius: 8px; font-size: 0.95rem; position: relative; word-wrap: break-word; display: flex; flex-direction: column; box-shadow: 0 1px 2px rgba(0,0,0,0.1); }
-        .msg-me { align-self: flex-end; background: var(--msg-me); border-radius: 8px 0 8px 8px; }
-        .msg-other { align-self: flex-start; background: var(--msg-other); border-radius: 0 8px 8px 8px; }
-        
-        /* تمييز رسالة الطوارئ */
-        .msg-emergency { background: #ffebee !important; border: 2px solid red; align-self: center; width: 90%; text-align: center; animation: shake 0.5s; }
-        @keyframes shake { 0% { transform: translate(1px, 1px); } 50% { transform: translate(-1px, -1px); } 100% { transform: translate(1px, 1px); } }
+    /* ================= شاشة الدخول والنوافذ المنبثقة ================= */
+    #login-screen, .modal { 
+        position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
+        background: var(--bg-body); /* في الوضع الليلي تكون معتمة */
+        display: flex; justify-content: center; align-items: center; z-index: 2000;
+        transition: 0.5s;
+    }
+    .modal { background: rgba(0,0,0,0.5); backdrop-filter: blur(5px); }
+    
+    .login-box { 
+        background: var(--bg-card); 
+        padding: 40px; 
+        border-radius: 24px; /* زوايا أكثر دائرية */
+        box-shadow: var(--shadow-soft);
+        width: 90%; max-width: 380px; text-align: center;
+        border: 1px solid var(--border-color);
+    }
+    .login-box h2 { color: var(--primary); font-weight: 700; margin-bottom: 25px; }
+    
+    /* حقول الإدخال العصرية */
+    .login-box input, .modal input, .input-zone input[type="text"] { 
+        width: 100%; padding: 14px 18px; margin: 10px 0; 
+        border: 1px solid var(--border-color); 
+        border-radius: 16px; 
+        background: var(--bg-body); 
+        color: var(--text-main); 
+        font-size: 1rem; outline: none;
+        transition: 0.3s;
+    }
+    .login-box input:focus, .input-zone input:focus {
+        border-color: var(--primary);
+        box-shadow: 0 0 0 3px rgba(var(--primary-hue), 90%, 55%, 0.2);
+    }
 
-        .sender-name { font-size: 0.7rem; color: var(--primary); font-weight: bold; margin-bottom: 2px; }
-        .msg-time { font-size: 0.65rem; color: #999; align-self: flex-end; margin-top: 3px; }
-        .msg-img { max-width: 100%; border-radius: 5px; margin-top: 5px; display: block; cursor: pointer; }
+    /* الأزرار العصرية */
+    .btn-main { 
+        width: 100%; padding: 14px; border: none; 
+        background: linear-gradient(135deg, var(--primary), var(--accent)); 
+        color: white; border-radius: 16px; font-weight: 700; font-size: 1.05rem; margin-top: 15px;
+        box-shadow: 0 4px 15px rgba(var(--primary-hue), 90%, 55%, 0.3);
+    }
+    .btn-main:hover { transform: translateY(-2px); box-shadow: 0 8px 25px rgba(var(--primary-hue), 90%, 55%, 0.4); }
+    .btn-outline { 
+        background: transparent; border: 2px solid var(--primary); 
+        color: var(--primary); margin-top: 10px; width: 100%; padding: 12px; border-radius: 16px; font-weight: 600;
+    }
+    .btn-outline:hover { background: var(--primary); color: white; }
 
-        /* منطقة الإدخال */
-        .input-zone { padding: 10px; background: var(--bg-sidebar); display: flex; gap: 8px; align-items: center; border-top: 1px solid var(--border); }
-        .input-zone input[type="text"] { flex: 1; padding: 10px; border-radius: 20px; border: 1px solid var(--border); background: var(--bg-body); color: var(--text-main); }
-        .icon-btn { background: none; border: none; font-size: 1.4rem; padding: 5px; color: #555; transition: transform 0.2s; }
-        [data-theme="dark"] .icon-btn { color: #ccc; }
-        .icon-btn:active { transform: scale(0.9); }
-        .pulse { animation: pulse 1s infinite; color: red !important; }
-        @keyframes pulse { 0% { transform: scale(1); } 50% { transform: scale(1.2); } 100% { transform: scale(1); } }
+    /* ================= تخطيط التطبيق ================= */
+    #app-container { display: none; height: 100vh; width: 100%; }
+    
+    /* القائمة الجانبية (Sidebar) */
+    .sidebar { 
+        width: 320px; min-width: 320px; 
+        background: var(--bg-glass); /* تأثير زجاجي */
+        backdrop-filter: blur(15px);
+        border-left: 1px solid var(--border-color); 
+        display: flex; flex-direction: column; height: 100%; z-index: 100;
+    }
+    .sidebar-header { 
+        padding: 25px 20px; 
+        background: transparent;
+        border-bottom: 1px solid var(--border-color);
+    }
+    .user-info { display: flex; justify-content: space-between; align-items: center; font-weight: 700; font-size: 1.1rem;}
+    
+    /* أزرار القائمة */
+    .chat-btn { 
+        padding: 15px 20px; cursor: pointer; display: flex; align-items: center; gap: 15px; 
+        margin: 8px 12px; border-radius: 16px; /* ليست ملتصقة بالحواف */
+        transition: 0.3s; color: var(--text-muted); font-weight: 600;
+    }
+    .chat-btn:hover, .chat-btn.active { 
+        background: rgba(var(--primary-hue), 90%, 55%, 0.1); color: var(--primary); 
+    }
+    .user-avatar { 
+        width: 45px; height: 45px; border-radius: 14px; /* Squircle */
+        display: flex; justify-content: center; align-items: center; 
+        background: rgba(var(--primary-hue), 90%, 55%, 0.1); color: var(--primary); font-size: 1.4rem;
+        box-shadow: inset 0 0 0 1px rgba(var(--primary-hue), 90%, 55%, 0.1);
+    }
+    
+    /* زر الطوارئ */
+    .emergency-btn { 
+        background: rgba(255, 71, 87, 0.1) !important; color: var(--danger) !important; 
+        border: 1px solid rgba(255, 71, 87, 0.2); 
+    }
+    .emergency-btn:hover { background: rgba(255, 71, 87, 0.2) !important; }
+    .emergency-btn .user-avatar { background: var(--danger) !important; color: white !important; }
+    
+    /* منطقة الشات */
+    .chat-area { flex: 1; display: flex; flex-direction: column; background: transparent; position: relative; }
+    .chat-header { 
+        padding: 15px 20px; height: 80px;
+        background: var(--bg-glass); /* تأثير زجاجي */
+        backdrop-filter: blur(15px);
+        border-bottom: 1px solid var(--border-color);
+        display: flex; justify-content: space-between; align-items: center;
+        box-shadow: var(--shadow-soft);
+        z-index: 10;
+    }
+    
+    /* الرسائل (فقاعات الشات) */
+    .chat-messages { flex: 1; overflow-y: auto; padding: 20px; display: flex; flex-direction: column; gap: 12px; }
+    .msg { 
+        max-width: 70%; padding: 12px 18px; border-radius: 20px; font-size: 0.95rem; position: relative; word-wrap: break-word; display: flex; flex-direction: column; 
+        box-shadow: var(--shadow-soft);
+        animation: fadeIn 0.3s ease;
+    }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
-        /* للجوال */
-        @media (max-width: 768px) {
-            .sidebar { width: 100%; position: absolute; z-index: 100; transition: transform 0.3s; }
-            .sidebar.hidden { transform: translateX(100%); }
-            #back-btn { display: block !important; }
-        }
-        #back-btn { display: none; font-size: 1.5rem; background: none; border: none; color: var(--text-main); }
+    .msg-me { 
+        align-self: flex-end; 
+        background: var(--msg-me-bg); color: var(--msg-me-text); 
+        border-radius: 20px 20px 4px 20px; /* شكل عصري */
+    }
+    .msg-other { 
+        align-self: flex-start; 
+        background: var(--msg-other-bg); color: var(--text-main);
+        border-radius: 20px 20px 20px 4px;
+        border: 1px solid var(--border-color);
+    }
+    
+    /* تمييز رسالة الطوارئ */
+    .msg-emergency { 
+        background: linear-gradient(135deg, #ff4757, #ff6b81) !important; color: white !important;
+        align-self: center; width: 85%; text-align: center; padding: 20px; font-weight: bold;
+        box-shadow: 0 10px 30px rgba(255, 71, 87, 0.3);
+    }
 
-        /* تكبير الصورة */
-        #lightbox { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); display: none; justify-content: center; align-items: center; z-index: 4000; }
-        #lightbox img { max-width: 95%; max-height: 95%; }
-    </style>
+    .sender-name { font-size: 0.75rem; color: var(--text-muted); font-weight: 700; margin-bottom: 5px; }
+    .msg-me .sender-name { color: rgba(255,255,255,0.8); }
+    .msg-time { font-size: 0.65rem; color: var(--text-muted); align-self: flex-end; margin-top: 5px; opacity: 0.8; }
+    .msg-me .msg-time { color: rgba(255,255,255,0.8); }
+    .msg-img { max-width: 100%; border-radius: 12px; margin-top: 8px; display: block; cursor: pointer; transition: 0.3s; }
+    .msg-img:hover { transform: scale(1.02); }
+
+    /* منطقة الإدخال (Input Zone) */
+    .input-zone { 
+        padding: 15px 20px; 
+        background: var(--bg-glass); /* تأثير زجاجي */
+        backdrop-filter: blur(15px);
+        display: flex; gap: 12px; align-items: center; 
+        border-top: 1px solid var(--border-color);
+        box-shadow: 0 -5px 20px rgba(0,0,0,0.05);
+    }
+    .icon-btn { 
+        background: rgba(var(--primary-hue), 90%, 55%, 0.1); border: none; font-size: 1.3rem; 
+        padding: 10px; color: var(--primary); border-radius: 14px;
+        transition: 0.3s; flex-shrink: 0;
+    }
+    .icon-btn:hover { background: var(--primary); color: white; transform: translateY(-3px); }
+    .icon-btn:active { transform: scale(0.95); }
+    
+    /* زر الإرسال */
+    .send-btn {
+        background: linear-gradient(135deg, var(--primary), var(--accent)); color: white;
+        padding: 10px 15px;
+        box-shadow: 0 4px 15px rgba(var(--primary-hue), 90%, 55%, 0.3);
+    }
+    .send-btn:hover { color: white; }
+
+    /* تأثير النبض */
+    .pulse { animation: pulse 1.5s infinite; background: var(--danger) !important; color: white !important; box-shadow: 0 0 20px var(--danger); }
+    @keyframes pulse { 0% { transform: scale(1); opacity: 1; } 50% { transform: scale(1.1); opacity: 0.8; } 100% { transform: scale(1); opacity: 1; } }
+
+    /* للجوال */
+    @media (max-width: 768px) {
+        .sidebar { position: absolute; height: 100%; box-shadow: var(--shadow-glass); transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1); }
+        .sidebar.hidden { transform: translateX(100%); }
+        #back-btn { display: flex !important; align-items: center; justify-content: center; }
+    }
+    #back-btn { display: none; width: 40px; height: 40px; background: var(--bg-body); border-radius: 12px; border: 1px solid var(--border-color); color: var(--text-main); }
+
+    /* تكبير الصورة */
+    #lightbox { background: rgba(0, 0, 0, 0.85); backdrop-filter: blur(10px); }
+    #lightbox img { border-radius: 20px; box-shadow: var(--shadow-soft); }
+</style>
 </head>
 <body data-theme="light">
 
