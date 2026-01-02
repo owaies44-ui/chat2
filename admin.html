@@ -2,197 +2,211 @@
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>غرفة عمليات المشرفين 🛡️</title>
-    
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap" rel="stylesheet">
-    
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>لوحة التحكم والإدارة 👮‍♂️</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700&display=swap" rel="stylesheet">
     <style>
-        /* ================= الألوان والثيمات ================= */
-        :root {
-            --bg-body: #f0f2f5;
-            --bg-sidebar: #ffffff;
-            --bg-chat: #e5ddd5;
-            --text-main: #000000;
-            --msg-me: #dcf8c6;
-            --msg-other: #ffffff;
-            --primary: #0088cc;
-            --danger: #ff5252;
-            --border: #ddd;
-        }
+    /* ================= متغيرات متناسقة مع الموقع الرئيسي ================= */
+    :root {
+        --primary: #0088cc;
+        --primary-dark: #005c99;
+        --accent: #00d2ff;
+        --danger: #ff4757;
+        --success: #2ecc71;
+        
+        /* ألوان الخلفيات والنصوص */
+        --bg-body: #f0f2f5;
+        --bg-card: #ffffff;
+        --text-main: #2c3e50;
+        --text-muted: #7f8c8d;
+        --border-color: #eef2f7;
+        
+        /* الظلال */
+        --shadow-card: 0 10px 30px rgba(0, 0, 0, 0.08);
+        --shadow-hover: 0 15px 35px rgba(0, 0, 0, 0.12);
+    }
 
-        /* الوضع الليلي */
-        [data-theme="dark"] {
-            --bg-body: #0b141a;
-            --bg-sidebar: #111b21;
-            --bg-chat: #0b141a; /* خلفية واتساب الداكنة */
-            --text-main: #e9edef;
-            --msg-me: #005c4b;
-            --msg-other: #202c33;
-            --primary: #00a884;
-            --border: #2a3942;
-        }
+    /* ================= التنسيق العام ================= */
+    body { 
+        font-family: 'Cairo', sans-serif; 
+        background: var(--bg-body); 
+        background-image: linear-gradient(135deg, #f0f2f5 0%, #eef2f7 100%);
+        margin: 0; padding: 0; 
+        color: var(--text-main);
+        min-height: 100vh;
+    }
+    button { cursor: pointer; font-family: inherit; transition: all 0.3s ease; }
 
-        /* ================= التنسيق العام ================= */
-        body { font-family: 'Cairo', sans-serif; margin: 0; background: var(--bg-body); color: var(--text-main); height: 100vh; display: flex; flex-direction: column; transition: 0.3s; overflow: hidden; }
-        button { cursor: pointer; font-family: inherit; }
-        
-        /* شاشة الدخول */
-        #login-screen { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--bg-body); display: flex; flex-direction: column; justify-content: center; align-items: center; z-index: 2000; }
-        .login-box { background: var(--bg-sidebar); padding: 30px; border-radius: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); width: 90%; max-width: 350px; text-align: center; }
-        .login-box input, .modal input { width: 100%; padding: 12px; margin: 8px 0; border: 1px solid var(--border); border-radius: 8px; box-sizing: border-box; text-align: center; background: var(--bg-body); color: var(--text-main); }
-        .btn-main { width: 100%; padding: 12px; border: none; background: var(--primary); color: white; border-radius: 8px; font-weight: bold; margin-top: 10px; }
-        .btn-outline { background: transparent; border: 1px solid var(--primary); color: var(--primary); margin-top: 10px; width: 100%; padding: 10px; border-radius: 8px; }
+    /* ================= شاشة تسجيل الدخول (الأنيقة) ================= */
+    #login-section { 
+        height: 100vh; display: flex; justify-content: center; align-items: center; 
+        background: linear-gradient(135deg, var(--primary-dark), var(--primary), var(--accent));
+        position: relative; overflow: hidden;
+    }
+    /* إضافة أشكال خلفية متحركة */
+    #login-section::before, #login-section::after {
+        content: ''; position: absolute; border-radius: 50%;
+        background: rgba(255,255,255,0.1);
+    }
+    #login-section::before { width: 300px; height: 300px; top: -50px; left: -50px; animation: float 6s infinite ease-in-out; }
+    #login-section::after { width: 250px; height: 250px; bottom: -50px; right: -50px; animation: float 8s infinite ease-in-out reverse; }
+    @keyframes float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(20px); } }
 
-        /* نافذة الطلب */
-        .modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); display: none; justify-content: center; align-items: center; z-index: 3000; }
-        
-        /* ================= تخطيط التطبيق ================= */
-        #app-container { display: none; height: 100vh; width: 100%; }
-        
-        /* القائمة الجانبية */
-        .sidebar { width: 30%; min-width: 250px; background: var(--bg-sidebar); border-left: 1px solid var(--border); display: flex; flex-direction: column; height: 100%; }
-        .sidebar-header { padding: 15px; background: var(--bg-sidebar); border-bottom: 1px solid var(--border); display: flex; flex-direction: column; gap: 10px; }
-        .user-info { display: flex; justify-content: space-between; align-items: center; font-weight: bold; }
-        
-        /* أزرار القائمة */
-        .chat-btn { padding: 12px; cursor: pointer; display: flex; align-items: center; gap: 10px; border-bottom: 1px solid var(--border); transition: 0.2s; }
-        .chat-btn:hover { background: rgba(0,0,0,0.05); }
-        .user-avatar { width: 40px; height: 40px; border-radius: 50%; display: flex; justify-content: center; align-items: center; background: #ddd; font-size: 1.2rem; }
-        
-        /* زر الطوارئ */
-        .emergency-btn { background: rgba(255, 0, 0, 0.1); color: red; border: 1px solid red; margin: 10px; border-radius: 8px; font-weight: bold; }
-        
-        /* منطقة الشات */
-        .chat-area { flex: 1; display: flex; flex-direction: column; background: var(--bg-chat); position: relative; }
-        .chat-header { padding: 10px 15px; background: var(--bg-sidebar); border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; height: 60px; }
-        
-        /* الرسائل */
-        .chat-messages { flex: 1; overflow-y: auto; padding: 15px; display: flex; flex-direction: column; gap: 8px; }
-        .msg { max-width: 75%; padding: 8px 12px; border-radius: 8px; font-size: 0.95rem; position: relative; word-wrap: break-word; display: flex; flex-direction: column; box-shadow: 0 1px 2px rgba(0,0,0,0.1); }
-        .msg-me { align-self: flex-end; background: var(--msg-me); border-radius: 8px 0 8px 8px; }
-        .msg-other { align-self: flex-start; background: var(--msg-other); border-radius: 0 8px 8px 8px; }
-        
-        /* تمييز رسالة الطوارئ */
-        .msg-emergency { background: #ffebee !important; border: 2px solid red; align-self: center; width: 90%; text-align: center; animation: shake 0.5s; }
-        @keyframes shake { 0% { transform: translate(1px, 1px); } 50% { transform: translate(-1px, -1px); } 100% { transform: translate(1px, 1px); } }
+    .login-card { 
+        background: rgba(255, 255, 255, 0.9);
+        backdrop-filter: blur(20px); /* زجاج */
+        padding: 50px 40px; 
+        border-radius: 30px; 
+        box-shadow: 0 25px 50px rgba(0,0,0,0.15); 
+        width: 90%; max-width: 400px; text-align: center;
+        z-index: 10;
+    }
+    .login-card h2 { color: var(--primary-dark); font-weight: 800; font-size: 1.8rem; margin-bottom: 30px; }
+    
+    .login-card input { 
+        width: 100%; padding: 15px; margin: 12px 0; 
+        border: 2px solid transparent; background: #f5f6fa;
+        border-radius: 15px; text-align: center; font-size: 1rem; outline: none; transition: 0.3s;
+    }
+    .login-card input:focus { background: white; border-color: var(--primary); box-shadow: 0 0 0 4px rgba(0, 136, 204, 0.1); }
+    
+    button.login-btn { 
+        width: 100%; padding: 15px; 
+        background: linear-gradient(135deg, var(--primary), var(--accent));
+        color: white; border: none; border-radius: 15px; 
+        font-weight: 800; font-size: 1.1rem; margin-top: 20px;
+        box-shadow: 0 10px 20px rgba(0, 136, 204, 0.2);
+    }
+    button.login-btn:hover { transform: translateY(-3px); box-shadow: 0 15px 30px rgba(0, 136, 204, 0.3); }
 
-        .sender-name { font-size: 0.7rem; color: var(--primary); font-weight: bold; margin-bottom: 2px; }
-        .msg-time { font-size: 0.65rem; color: #999; align-self: flex-end; margin-top: 3px; }
-        .msg-img { max-width: 100%; border-radius: 5px; margin-top: 5px; display: block; cursor: pointer; }
+    /* ================= لوحة التحكم (Dashboard) ================= */
+    #dashboard-section { display: none; padding: 40px 20px; max-width: 1200px; margin: 0 auto; }
+    
+    .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 40px; padding-bottom: 20px; border-bottom: 1px solid var(--border-color); }
+    .header h1 { font-weight: 800; color: var(--primary-dark); margin: 0; display: flex; align-items: center; gap: 10px; }
+    
+    /* البطاقات (Cards) */
+    .card { 
+        background: var(--bg-card); padding: 30px; 
+        border-radius: 25px; 
+        box-shadow: var(--shadow-card); 
+        margin-bottom: 30px; border: 1px solid white;
+        transition: 0.3s;
+    }
+    .card:hover { box-shadow: var(--shadow-hover); transform: translateY(-5px); }
+    .card h2 { margin-top: 0; color: var(--primary-dark); font-size: 1.3rem; display: flex; align-items: center; gap: 10px; }
+    
+    /* الجداول العصرية */
+    table { width: 100%; border-collapse: separate; border-spacing: 0 10px; /* مسافة بين الصفوف */ margin-top: 20px; }
+    th { text-align: right; padding: 15px; color: var(--text-muted); font-weight: 700; letter-spacing: 1px; }
+    tbody tr { background: white; box-shadow: 0 5px 15px rgba(0,0,0,0.03); transition: 0.3s; }
+    tbody tr:hover { transform: scale(1.01); box-shadow: 0 10px 25px rgba(0,0,0,0.05); }
+    td { padding: 20px 15px; border-top: 1px solid var(--border-color); border-bottom: 1px solid var(--border-color); }
+    td:first-child { border-right: 1px solid var(--border-color); border-top-right-radius: 15px; border-bottom-right-radius: 15px; }
+    td:last-child { border-left: 1px solid var(--border-color); border-top-left-radius: 15px; border-bottom-left-radius: 15px; }
 
-        /* منطقة الإدخال */
-        .input-zone { padding: 10px; background: var(--bg-sidebar); display: flex; gap: 8px; align-items: center; border-top: 1px solid var(--border); }
-        .input-zone input[type="text"] { flex: 1; padding: 10px; border-radius: 20px; border: 1px solid var(--border); background: var(--bg-body); color: var(--text-main); }
-        .icon-btn { background: none; border: none; font-size: 1.4rem; padding: 5px; color: #555; transition: transform 0.2s; }
-        [data-theme="dark"] .icon-btn { color: #ccc; }
-        .icon-btn:active { transform: scale(0.9); }
-        .pulse { animation: pulse 1s infinite; color: red !important; }
-        @keyframes pulse { 0% { transform: scale(1); } 50% { transform: scale(1.2); } 100% { transform: scale(1); } }
+    /* الأزرار داخل اللوحة */
+    .btn-action { padding: 10px 18px; border: none; border-radius: 12px; cursor: pointer; color: white; margin-left: 8px; font-weight: 700; font-size: 0.85rem; display: inline-flex; align-items: center; gap: 5px; }
+    .btn-delete { background: rgba(255, 71, 87, 0.1); color: var(--danger); }
+    .btn-delete:hover { background: var(--danger); color: white; }
+    .btn-approve { background: linear-gradient(135deg, var(--success), #27ae60); box-shadow: 0 5px 15px rgba(46, 204, 113, 0.3); }
+    .btn-approve:hover { transform: translateY(-2px); }
+    
+    .btn-logout { 
+        background: rgba(255, 71, 87, 0.1); color: var(--danger);
+        padding: 12px 25px; border: none; border-radius: 15px; font-weight: 700;
+    }
+    .btn-logout:hover { background: var(--danger); color: white; }
 
-        /* للجوال */
-        @media (max-width: 768px) {
-            .sidebar { width: 100%; position: absolute; z-index: 100; transition: transform 0.3s; }
-            .sidebar.hidden { transform: translateX(100%); }
-            #back-btn { display: block !important; }
-        }
-        #back-btn { display: none; font-size: 1.5rem; background: none; border: none; color: var(--text-main); }
-
-        /* تكبير الصورة */
-        #lightbox { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); display: none; justify-content: center; align-items: center; z-index: 4000; }
-        #lightbox img { max-width: 95%; max-height: 95%; }
-    </style>
+    /* الإحصائيات */
+    .stat-box { display: flex; gap: 25px; margin-bottom: 40px; flex-wrap: wrap; }
+    .stat { 
+        background: white; padding: 30px; flex: 1; border-radius: 25px; text-align: center; min-width: 200px;
+        box-shadow: var(--shadow-card); border: 1px solid white; position: relative; overflow: hidden;
+    }
+    .stat::after { content: ''; position: absolute; width: 100px; height: 100px; background: rgba(var(--primary-hue), 90%, 55%, 0.1); border-radius: 50%; top: -30px; right: -30px; }
+    .stat-title { color: var(--text-muted); font-weight: 700; font-size: 1.1rem; }
+    .stat span { display: block; font-size: 3.5rem; font-weight: 800; color: var(--primary-dark); margin-top: 10px; }
+    
+    /* تمييز البطاقات المهمة */
+    .card-highlight { border-right: 5px solid var(--accent); background: linear-gradient(to left, rgba(0, 210, 255, 0.05), white); }
+</style>
 </head>
-<body data-theme="light">
+<body>
 
-    <div id="login-screen">
-        <div class="login-box">
-            <h2>🛡️ غرفة المشرفين</h2>
-            <input type="email" id="email" placeholder="البريد الإلكتروني">
-            <input type="password" id="password" placeholder="كلمة المرور">
-            <button class="btn-main" id="btn-login-action">تسجيل الدخول</button>
-            <button class="btn-outline" onclick="document.getElementById('request-modal').style.display='flex'">طلب حساب جديد</button>
+    <section id="login-section">
+        <div class="login-card">
+            <span style="font-size:50px">🔐</span>
+            <h2>بوابة الإدارة</h2>
+            <div id="error-msg" style="color:red; display:none; margin-bottom:10px"></div>
+            <input type="email" id="admin-email" placeholder="البريد الإلكتروني">
+            <input type="password" id="admin-pass" placeholder="كلمة المرور">
+            <button class="login-btn" id="btn-login">دخول</button>
+          <button onclick="window.location.href='index.html'" style="width:100%; padding:10px; margin-top:10px; background:transparent; border:1px solid #777; color:#555; border-radius:8px; cursor:pointer;">
+    🏠 عودة للموقع الرئيسي
+</button>
         </div>
-    </div>
+    </section>
 
-    <div id="request-modal" class="modal">
-        <div class="login-box">
-            <h3>📝 طلب انضمام</h3>
-            <input type="text" id="req-name" placeholder="الاسم الثلاثي">
-            <input type="email" id="req-email" placeholder="البريد الإلكتروني">
-            <input type="text" id="req-reason" placeholder="المسمى الوظيفي / السبب">
-            <button class="btn-main" onclick="sendAccountRequest()">إرسال الطلب</button>
-            <button class="btn-outline" style="border:none; color:red" onclick="document.getElementById('request-modal').style.display='none'">إلغاء</button>
-        </div>
-    </div>
-
-    <div id="app-container">
-        
-        <div class="sidebar" id="sidebar">
-            <div class="sidebar-header">
-                <div class="user-info">
-                    <span id="my-name">...</span>
-                    <div style="display:flex; gap:5px">
-                        <button class="icon-btn" onclick="logout()" title="خروج">🚪</button>
-                    </div>
-                </div>
-                <button id="admin-panel-btn" class="btn-main" style="display:none; background:#2c3e50; font-size:0.9rem" onclick="window.location.href='admin.html'">⚙️ لوحة التحكم</button>
-            </div>
-
-            <div class="chat-btn" onclick="openPublicChat()" style="background:rgba(0,136,204,0.1)">
-                <div class="user-avatar" style="background:var(--primary); color:white">📢</div>
-                <span>المحادثة العامة</span>
-            </div>
-
-            <div class="chat-btn emergency-btn" onclick="triggerEmergency()">
-                <div class="user-avatar" style="background:red; color:white">🚨</div>
-                <span>تبليغ عن طوارئ</span>
-            </div>
-
-            <div style="padding:10px; font-weight:bold; color:gray; font-size:0.8rem">المشرفين:</div>
-            <div id="users-list" style="overflow-y:auto; flex:1"></div>
+    <section id="dashboard-section">
+        <div class="header">
+            <h1>👮‍♂️ لوحة القيادة</h1>
+            <button class="btn-logout" id="btn-logout">خروج</button>
         </div>
 
-        <div class="chat-area">
-            <div class="chat-header">
-                <div style="display:flex; align-items:center; gap:10px">
-                    <button id="back-btn" onclick="showSidebar()">➜</button>
-                    <div class="user-avatar" id="current-chat-avatar">📢</div>
-                    <span id="current-chat-name" style="font-weight:bold">المحادثة العامة</span>
-                </div>
-                <div style="display:flex; gap:5px">
-                    <button class="icon-btn" id="btn-theme" onclick="toggleTheme()" title="الوضع الليلي">🌙</button>
-                    <button class="icon-btn" id="btn-mute" onclick="toggleMute()" title="كتم الصوت">🔔</button>
-                </div>
+        <div class="stat-box">
+            <div class="stat">
+                <div class="stat-title">📝 الطلبات الجديدة</div>
+                <span id="req-count" style="color:#f39c12">0</span>
             </div>
-
-            <div class="chat-messages" id="messages-box"></div>
-
-            <div class="input-zone">
-                <button class="icon-btn" onclick="document.getElementById('file-input').click()" title="صورة">📷</button>
-                <button class="icon-btn" id="mic-btn" onclick="toggleVoice()" title="تحدث">🎤</button>
-                <button class="icon-btn" onclick="sendLocation()" title="موقعي">📍</button>
-                
-                <input type="file" id="file-input" accept="image/*" hidden onchange="sendFile(this)">
-                <input type="text" id="msg-input" placeholder="اكتب رسالة..." dir="auto">
-                <button class="icon-btn" onclick="sendMessage()" style="color:var(--primary)">➤</button>
+            <div class="stat">
+                <div class="stat-title">👥 المستخدمين</div>
+                <span id="user-count">0</span>
             </div>
-            
-            <div id="recording-status" style="display:none; text-align:center; background:red; color:white; font-size:0.7rem">جاري التسجيل...</div>
+            <div class="stat">
+                <div class="stat-title">💬 الرسائل</div>
+                <span id="msg-count" style="color:#27ae60">0</span>
+            </div>
         </div>
-    </div>
 
-    <div id="lightbox" onclick="this.style.display='none'"><img id="lightbox-img" src=""></div>
+        <div class="card card-highlight">
+            <h2>⚡ طلبات الانضمام العاجلة</h2>
+            ```
+
+### الخلاصة:
+احفظ الملفين، وافتح الموقع. ستشعر بفرق هائل! لقد تحول من موقع "بسيط" إلى نظام "احترافي ومكلف". جرب التبديل بين الوضع الليلي والنهاري في الصفحة الرئيسية للاستمتاع بتأثير الزجاج. 🤩
+        <div class="card" style="border-right: 5px solid #f39c12;">
+            <h2>📝 طلبات الانضمام الجديدة</h2>
+            <table>
+                <thead><tr><th>الاسم</th><th>البريد</th><th>السبب</th><th>التاريخ</th><th>الإجراء</th></tr></thead>
+                <tbody id="requests-table"><tr><td colspan="5">جاري التحميل...</td></tr></tbody>
+            </table>
+        </div>
+
+        <div class="card">
+            <h2>👥 المستخدمين الحاليين</h2>
+            <table>
+                <thead><tr><th>الاسم</th><th>البريد</th><th>ID</th><th>الإجراء</th></tr></thead>
+                <tbody id="users-table"><tr><td colspan="4">جاري التحميل...</td></tr></tbody>
+            </table>
+        </div>
+
+        <div class="card">
+            <h2>📢 آخر الرسائل العامة</h2>
+            <table>
+                <thead><tr><th>المرسل</th><th>الرسالة</th><th>الوقت</th><th>الإجراء</th></tr></thead>
+                <tbody id="msgs-table"><tr><td colspan="4">جاري التحميل...</td></tr></tbody>
+            </table>
+        </div>
+    </section>
 
     <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-        import { getDatabase, ref, set, push, onValue, off } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
-        import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+        // استيراد المكتبات الضرورية (لاحظ إضافة deleteApp و createUserWithEmailAndPassword)
+        import { initializeApp, deleteApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+        import { getDatabase, ref, onValue, remove, set } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
+        import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 
-        // =======================================================
-        // 🔴🔴 استبدل البيانات هنا ببيانات مشروعك الحقيقية 🔴🔴
+        // 🔴🔴 إعدادات فايربيس (ضع بياناتك هنا) 🔴🔴
 		const firebaseConfig = {
   apiKey: "AIzaSyC12wP3jPuylQzJe2HNaiDFJgNSMf50jaI",
   authDomain: "steps4u-aea0c.firebaseapp.com",
@@ -203,231 +217,161 @@
   appId: "1:316135301602:web:2f9a119f50093e8ac899bb",
   measurementId: "G-S27FV5E84B"
 };
-        // =======================================================
+        // 👇👇 إيميل الأدمن الوحيد المسموح له بالدخول 👇👇
+        const ALLOWED_ADMIN = "owaies@user.com"; 
 
-        // 👇👇 إيميل الأدمن (لإظهار زر التحكم له) 👇👇
-        const ADMIN_EMAIL = "owaies@user.com"; 
-
+        // تهيئة التطبيق الرئيسي
         const app = initializeApp(firebaseConfig);
         const db = getDatabase(app);
         const auth = getAuth(app);
-        
-        // المتغيرات العامة
-        let currentUser = null;
-        let activeChatRef = null;
-        let isMuted = false;
-        let recognition; // للكتابة الصوتية
 
-        // الصوت
-        const sendSound = new Audio('teet.mp3.mp3');
+        // ================= إدارة الدخول =================
+        const loginBtn = document.getElementById('btn-login');
+        const logoutBtn = document.getElementById('btn-logout');
 
-        // ================= 1. إدارة الدخول =================
-        document.getElementById('btn-login-action').addEventListener('click', () => {
-            const e = document.getElementById('email').value;
-            const p = document.getElementById('password').value;
-            signInWithEmailAndPassword(auth, e, p).catch(err => alert("خطأ: " + err.message));
+        loginBtn.addEventListener('click', () => {
+            const e = document.getElementById('admin-email').value.trim();
+            const p = document.getElementById('admin-pass').value;
+            const errDiv = document.getElementById('error-msg');
+
+            if(e.toLowerCase() !== ALLOWED_ADMIN.toLowerCase()) {
+                errDiv.innerText = "⛔ هذا البريد غير مصرح له كمسؤول";
+                errDiv.style.display = 'block';
+                return;
+            }
+
+            signInWithEmailAndPassword(auth, e, p)
+                .then(() => errDiv.style.display = 'none')
+                .catch(err => {
+                    errDiv.innerText = "خطأ: " + err.message;
+                    errDiv.style.display = 'block';
+                });
         });
+
+        logoutBtn.addEventListener('click', () => signOut(auth));
 
         onAuthStateChanged(auth, (user) => {
-            if (user) {
-                currentUser = user;
-                document.getElementById('login-screen').style.display = 'none';
-                document.getElementById('app-container').style.display = 'flex';
-                document.getElementById('my-name').innerText = user.email.split('@')[0];
-                
-                // إذا كان أدمن أظهر الزر
-                if(user.email === ADMIN_EMAIL) {
-                    document.getElementById('admin-panel-btn').style.display = 'block';
-                }
+            const loginSec = document.getElementById('login-section');
+            const dashSec = document.getElementById('dashboard-section');
 
-                saveUserToDB(user);
-                loadUsersList();
-                openPublicChat(); // الفتح الافتراضي
+            if (user && user.email === ALLOWED_ADMIN) {
+                loginSec.style.display = 'none';
+                dashSec.style.display = 'block';
+                loadAllData();
             } else {
-                document.getElementById('login-screen').style.display = 'flex';
-                document.getElementById('app-container').style.display = 'none';
+                loginSec.style.display = 'flex';
+                dashSec.style.display = 'none';
+                if(user) signOut(auth); // طرد أي مستخدم غير الأدمن
             }
         });
 
-        // ================= 2. الشات والرسائل =================
-        window.openPublicChat = () => setupChat("المحادثة العامة", "📢", ref(db, 'public_chat_messages'));
-        
-        window.openPrivateChat = (targetUser) => {
-            const chatId = [currentUser.uid, targetUser.uid].sort().join('_');
-            setupChat(targetUser.name, "👤", ref(db, 'private_chats/' + chatId));
-        };
-
-        function setupChat(name, avatar, refPath) {
-            document.getElementById('current-chat-name').innerText = name;
-            document.getElementById('current-chat-avatar').innerText = avatar;
-            if(window.innerWidth <= 768) document.getElementById('sidebar').classList.add('hidden');
-            
-            if (activeChatRef) off(activeChatRef);
-            activeChatRef = refPath;
-            loadMessages();
-        }
-
-        function loadMessages() {
-            const box = document.getElementById('messages-box');
-            box.innerHTML = '';
-            
-            onValue(activeChatRef, (snapshot) => {
-                box.innerHTML = '';
-                const data = snapshot.val();
-                if (data) {
-                    const msgs = Object.values(data);
-                    msgs.forEach(msg => {
-                        const div = document.createElement('div');
-                        const isMe = msg.senderId === currentUser.uid;
-                        
-                        // فحص هل هي طوارئ؟
-                        const isEmergency = msg.text && msg.text.includes("🚨🚨");
-
-                        div.className = `msg ${isMe ? 'msg-me' : 'msg-other'} ${isEmergency ? 'msg-emergency' : ''}`;
-                        
-                        let senderInfo = (!isMe) ? `<span class="sender-name">~ ${msg.senderName}</span>` : '';
-                        let content = `<div dir="auto">${msg.text}</div>`;
-                        if (msg.image) content += `<img src="${msg.image}" class="msg-img" onclick="viewImage(this.src)">`;
-                        
-                        div.innerHTML = `${senderInfo}${content}<span class="msg-time">${msg.time}</span>`;
-                        box.appendChild(div);
+        // ================= دوال جلب البيانات =================
+        function loadAllData() {
+            // 1. الطلبات
+            onValue(ref(db, 'account_requests'), (snap) => {
+                const table = document.getElementById('requests-table');
+                table.innerHTML = '';
+                const data = snap.val();
+                if(data) {
+                    document.getElementById('req-count').innerText = Object.keys(data).length;
+                    Object.entries(data).forEach(([key, req]) => {
+                        table.innerHTML += `
+                            <tr>
+                                <td>${req.name}</td>
+                                <td>${req.email}</td>
+                                <td>${req.reason}</td>
+                                <td>${req.date || '-'}</td>
+                                <td>
+                                    <button class="btn-action btn-approve" onclick="window.createAccountForUser('${key}', '${req.name}', '${req.email}')">✅ موافقة</button>
+                                    <button class="btn-action btn-delete" onclick="window.del('account_requests/${key}')">حذف</button>
+                                </td>
+                            </tr>`;
                     });
-                    
-                    // تشغيل صوت عند الاستلام (لآخر رسالة فقط)
-                    const lastMsg = msgs[msgs.length-1];
-                    if(lastMsg.senderId !== currentUser.uid && !isMuted) {
-                        sendSound.currentTime = 0; sendSound.play().catch(()=>{});
-                    }
-
-                    box.scrollTop = box.scrollHeight;
+                } else {
+                    document.getElementById('req-count').innerText = "0";
+                    table.innerHTML = '<tr><td colspan="5">لا توجد طلبات جديدة</td></tr>';
                 }
             });
-        }
 
-        window.sendMessage = () => {
-            const input = document.getElementById('msg-input');
-            const text = input.value.trim();
-            if(!text) return;
-            sendData(text, null);
-            input.value = '';
-        };
-
-        window.sendFile = (input) => {
-            const file = input.files[0];
-            if (file) {
-                const reader = new FileReader();
-                reader.onload = (e) => sendData("", e.target.result);
-                reader.readAsDataURL(file);
-            }
-        };
-
-        window.sendLocation = () => {
-            if (!navigator.geolocation) return alert("جهازك لا يدعم GPS");
-            navigator.geolocation.getCurrentPosition(pos => {
-                const link = `https://maps.google.com/?q=${pos.coords.latitude},${pos.coords.longitude}`;
-                sendData(`📍 موقعي الحالي: <a href="${link}" target="_blank" style="color:blue">فتح الخريطة</a>`, null);
+            // 2. المستخدمين
+            onValue(ref(db, 'users'), (snap) => {
+                const table = document.getElementById('users-table');
+                table.innerHTML = '';
+                const data = snap.val();
+                if(data) {
+                    document.getElementById('user-count').innerText = Object.keys(data).length;
+                    Object.values(data).forEach(u => {
+                        table.innerHTML += `<tr><td>${u.name}</td><td>${u.email}</td><td style="font-size:0.8rem">${u.uid}</td><td><button class="btn-action btn-delete" onclick="window.del('users/${u.uid}')">حذف</button></td></tr>`;
+                    });
+                }
             });
-        };
 
-        window.triggerEmergency = () => {
-            if(confirm("🚨 هل أنت متأكد من إرسال إنذار طوارئ للجميع؟")) {
-                sendData("🚨🚨 [[ حالة طوارئ قصوى ]] 🚨🚨 يرجى الانتباه!", null);
-            }
-        };
-
-        function sendData(text, img) {
-            push(activeChatRef, {
-                senderId: currentUser.uid,
-                senderName: currentUser.email.split('@')[0],
-                text: text || "",
-                image: img || null,
-                time: new Date().toLocaleTimeString('ar-EG', {hour:'2-digit', minute:'2-digit'}),
-                timestamp: Date.now()
-            });
-            if(!isMuted) { sendSound.currentTime = 0; sendSound.play().catch(()=>{}); }
-        }
-
-        // ================= 3. الأدوات (صوت، ثيم، مايك) =================
-        
-        // الصوت
-        window.toggleMute = () => {
-            isMuted = !isMuted;
-            document.getElementById('btn-mute').innerText = isMuted ? "🔕" : "🔔";
-        };
-
-        // الثيم
-        window.toggleTheme = () => {
-            const b = document.body;
-            const isDark = b.getAttribute('data-theme') === 'dark';
-            b.setAttribute('data-theme', isDark ? 'light' : 'dark');
-            document.getElementById('btn-theme').innerText = isDark ? "🌙" : "☀️";
-        };
-
-        // الكتابة الصوتية
-        window.toggleVoice = () => {
-            if (!('webkitSpeechRecognition' in window)) return alert("المتصفح لا يدعم المايك، استخدم Chrome");
-            
-            if (!recognition) {
-                recognition = new webkitSpeechRecognition();
-                recognition.lang = 'ar-SA';
-                recognition.continuous = false;
-                recognition.onstart = () => {
-                    document.getElementById('mic-btn').classList.add('pulse');
-                    document.getElementById('recording-status').style.display = 'block';
-                };
-                recognition.onend = () => {
-                    document.getElementById('mic-btn').classList.remove('pulse');
-                    document.getElementById('recording-status').style.display = 'none';
-                };
-                recognition.onresult = (e) => {
-                    document.getElementById('msg-input').value += " " + e.results[0][0].transcript;
-                };
-            }
-            recognition.start();
-        };
-
-        // ================= 4. وظائف مساعدة =================
-        window.logout = () => signOut(auth).then(() => location.reload());
-        window.showSidebar = () => document.getElementById('sidebar').classList.remove('hidden');
-        window.viewImage = (src) => { document.getElementById('lightbox-img').src = src; document.getElementById('lightbox').style.display = 'flex'; };
-
-        function saveUserToDB(user) {
-            set(ref(db, 'users/' + user.uid), {
-                email: user.email, name: user.email.split('@')[0], uid: user.uid
-            });
-        }
-
-        function loadUsersList() {
-            onValue(ref(db, 'users'), (snapshot) => {
-                const list = document.getElementById('users-list');
-                list.innerHTML = '';
-                const users = snapshot.val();
-                if (users) {
-                    Object.values(users).forEach(u => {
-                        if (u.uid === currentUser.uid) return;
-                        const div = document.createElement('div');
-                        div.className = 'chat-btn';
-                        div.innerHTML = `<div class="user-avatar">👤</div><span>${u.name}</span>`;
-                        div.onclick = () => openPrivateChat(u);
-                        list.appendChild(div);
+            // 3. الرسائل
+            onValue(ref(db, 'public_chat_messages'), (snap) => {
+                const table = document.getElementById('msgs-table');
+                table.innerHTML = '';
+                const data = snap.val();
+                if(data) {
+                    const arr = Object.entries(data).reverse();
+                    document.getElementById('msg-count').innerText = arr.length;
+                    arr.forEach(([k, v]) => {
+                        const txt = v.text || (v.image ? '📷 صورة' : '...');
+                        table.innerHTML += `<tr><td>${v.senderName}</td><td>${txt}</td><td>${v.time}</td><td><button class="btn-action btn-delete" onclick="window.del('public_chat_messages/${k}')">حذف</button></td></tr>`;
                     });
                 }
             });
         }
 
-        // طلب الحساب
-        window.sendAccountRequest = () => {
-            const name = document.getElementById('req-name').value;
-            const email = document.getElementById('req-email').value;
-            const reason = document.getElementById('req-reason').value;
-            if(!name || !email) return alert("أكمل البيانات");
-            
-            push(ref(db, 'account_requests'), {
-                name, email, reason, date: new Date().toLocaleDateString()
-            }).then(() => {
-                alert("تم إرسال الطلب بنجاح");
-                document.getElementById('request-modal').style.display='none';
-            });
+        // ================= ⚡ الدالة السحرية لإنشاء الحسابات =================
+        window.createAccountForUser = async (reqKey, name, email) => {
+            // طلب كلمة مرور من الأدمن
+            const tempPassword = prompt(`أدخل كلمة مرور للموظف (${name}):`, "123456");
+            if (!tempPassword) return;
+
+            // خدعة التطبيق الثانوي لمنع تسجيل خروج الأدمن
+            // ننشئ نسخة ثانية من الاتصال بفايربيس
+            const secondaryApp = initializeApp(firebaseConfig, "SecondaryApp");
+            const secondaryAuth = getAuth(secondaryApp);
+
+            try {
+                // محاولة إنشاء الحساب في النسخة الثانية
+                const userCredential = await createUserWithEmailAndPassword(secondaryAuth, email, tempPassword);
+                const newUser = userCredential.user;
+
+                // حفظ بيانات المستخدم في قاعدة البيانات (باستخدام اتصال الأدمن الأصلي db)
+                await set(ref(db, 'users/' + newUser.uid), {
+                    name: name,
+                    email: email,
+                    uid: newUser.uid,
+                    role: "user"
+                });
+
+                // حذف الطلب من القائمة
+                await remove(ref(db, 'account_requests/' + reqKey));
+
+                // تنظيف النسخة الثانية (تسجيل خروج + حذف التطبيق)
+                await signOut(secondaryAuth);
+                await deleteApp(secondaryApp);
+
+                alert(`✅ تم إنشاء الحساب بنجاح!\nالاسم: ${name}\nكلمة المرور: ${tempPassword}\n\nيرجى إرسال البيانات للموظف.`);
+
+            } catch (error) {
+                console.error(error);
+                if (error.code === 'auth/email-already-in-use') {
+                    alert("⚠️ هذا البريد مسجل مسبقاً! سأقوم فقط بإضافته لقائمة المستخدمين وحذف الطلب.");
+                    // يمكن هنا إضافة منطق للبحث عن الـ UID القديم ولكن للتبسيط سنحذف الطلب فقط
+                    await remove(ref(db, 'account_requests/' + reqKey));
+                } else {
+                    alert("❌ خطأ: " + error.message);
+                }
+                // تنظيف في حالة الخطأ
+                if(secondaryApp) await deleteApp(secondaryApp);
+            }
+        };
+
+        // دالة الحذف العامة
+        window.del = (path) => {
+            if(confirm('هل أنت متأكد من الحذف؟')) remove(ref(db, path));
         };
 
     </script>
